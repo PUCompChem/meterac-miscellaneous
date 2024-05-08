@@ -444,3 +444,9 @@ def GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
         return 0.0
     else:
         return (1.0 / (1.0 + math.exp(x)))
+
+
+def GasIndexAlgorithm__mox_model__set_parameters(params: GasIndexAlgorithmParams,
+                                SRAW_STD: float, SRAW_MEAN: float):
+    params.m_Mox_Model__Sraw_Std = SRAW_STD
+    params.m_Mox_Model__Sraw_Mean = SRAW_MEAN
