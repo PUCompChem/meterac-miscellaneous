@@ -302,17 +302,6 @@ def GasIndexAlgorithm__mean_variance_estimator__is_initialized(params: GasIndexA
 
 
 def GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params: GasIndexAlgorithmParams):
-    '''
-    float uptime_limit;
-    float sigmoid_gamma_mean;
-    float gamma_mean;
-    float gating_threshold_mean;
-    float sigmoid_gating_mean;
-    float sigmoid_gamma_variance;
-    float gamma_variance;
-    float gating_threshold_variance;
-    float sigmoid_gating_variance;
-    '''
 
     uptime_limit = (GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__FIX16_MAX - params.mSamplingInterval)
 
@@ -337,12 +326,14 @@ def GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params: GasInde
            params.mGating_Threshold) *
           GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
               params, params.m_Mean_Variance_Estimator___Uptime_Gating)))
+
     GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
         params, gating_threshold_mean,
         GasIndexAlgorithm_GATING_THRESHOLD_TRANSITION)
     sigmoid_gating_mean = GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
             params, params.mGas_Index)
     params.m_Mean_Variance_Estimator__Gamma_Mean = sigmoid_gating_mean * gamma_mean
+
     GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
         params, params.mInit_Duration_Variance,
         GasIndexAlgorithm_INIT_TRANSITION_VARIANCE)
@@ -357,6 +348,7 @@ def GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params: GasInde
            params.mGating_Threshold) *
           GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
               params, params.m_Mean_Variance_Estimator___Uptime_Gating)))
+
     GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
         params, gating_threshold_variance,
         GasIndexAlgorithm_GATING_THRESHOLD_TRANSITION)
@@ -378,11 +370,6 @@ def GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params: GasInde
 
 
 def GasIndexAlgorithm__mean_variance_estimator__process(params: GasIndexAlgorithmParams, sraw: float):
-    '''
-    float delta_sgp;
-    float c;
-    float additional_scaling;
-    '''
 
     if params.m_Mean_Variance_Estimator___Initialized == False:
         params.m_Mean_Variance_Estimator___Initialized = True
@@ -426,16 +413,13 @@ def GasIndexAlgorithm__mean_variance_estimator__process(params: GasIndexAlgorith
               GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING))
 
 
-
 def GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
-    params: GasIndexAlgorithmParams, X0: float , K: float):
-
+            params: GasIndexAlgorithmParams, X0: float , K: float):
     params.m_Mean_Variance_Estimator___Sigmoid__K = K
     params.m_Mean_Variance_Estimator___Sigmoid__X0 = X0
 
 def GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
-    params: GasIndexAlgorithmParams, sample: float) -> float:
-
+            params: GasIndexAlgorithmParams, sample: float) -> float:
     x = (params.m_Mean_Variance_Estimator___Sigmoid__K *
          (sample - params.m_Mean_Variance_Estimator___Sigmoid__X0))
     if x < -50.0:
@@ -473,7 +457,6 @@ def GasIndexAlgorithm__sigmoid_scaled__set_parameters(params: GasIndexAlgorithmP
 
 def GasIndexAlgorithm__sigmoid_scaled__process(params: GasIndexAlgorithmParams,
                                            sample: float) -> float:
-
     x = params.m_Sigmoid_Scaled__K * (sample - params.m_Sigmoid_Scaled__X0)
     if ((x < -50.0)):
         return GasIndexAlgorithm_SIGMOID_L
@@ -494,6 +477,7 @@ def GasIndexAlgorithm__sigmoid_scaled__process(params: GasIndexAlgorithmParams,
             return ((params.mIndex_Offset /
                      params.m_Sigmoid_Scaled__Offset_Default) *
                     (GasIndexAlgorithm_SIGMOID_L / (1.0 + math.exp(x))))
+
 
 def GasIndexAlgorithm__adaptive_lowpass__set_parameters(params: GasIndexAlgorithmParams):
     params.m_Adaptive_Lowpass__A1 = (params.mSamplingInterval /
