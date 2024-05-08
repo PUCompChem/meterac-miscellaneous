@@ -34,6 +34,7 @@ with following LICENCE
  */
 '''
 
+import math
 
 #Define Global variables
 GasIndexAlgorithm_ALGORITHM_TYPE_VOC = int(0)
@@ -374,3 +375,52 @@ def GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params: GasInde
     if (params.m_Mean_Variance_Estimator___Gating_Duration_Minutes >
          params.mGating_Max_Duration_Minutes):
         params.m_Mean_Variance_Estimator___Uptime_Gating = 0.0
+
+
+def GasIndexAlgorithm__mean_variance_estimator__process(params: GasIndexAlgorithmParams, sraw: float):
+    '''
+    float delta_sgp;
+    float c;
+    float additional_scaling;
+    '''
+
+    if params.m_Mean_Variance_Estimator___Initialized == False:
+        params.m_Mean_Variance_Estimator___Initialized = True
+        params.m_Mean_Variance_Estimator___Sraw_Offset = sraw
+        params.m_Mean_Variance_Estimator___Mean = 0.0
+    else:
+        if ((params.m_Mean_Variance_Estimator___Mean >= 100.0) or
+             (params.m_Mean_Variance_Estimator___Mean <= -100.0)):
+            params.m_Mean_Variance_Estimator___Sraw_Offset = (
+                params.m_Mean_Variance_Estimator___Sraw_Offset +
+                 params.m_Mean_Variance_Estimator___Mean)
+            params.m_Mean_Variance_Estimator___Mean = 0.0
+
+        sraw = sraw - params.m_Mean_Variance_Estimator___Sraw_Offset
+        GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params)
+        delta_sgp = ((sraw - params.m_Mean_Variance_Estimator___Mean) /
+                     GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING)
+        if delta_sgp < 0.0:
+            c = params.m_Mean_Variance_Estimator___Std - delta_sgp
+        else:
+            c = params.m_Mean_Variance_Estimator___Std + delta_sgp
+
+        additional_scaling = 1.0;
+        if c > 1440.0:
+            additional_scaling = (c / 1440.0) * (c / 1440.0)
+
+        params.m_Mean_Variance_Estimator___Std = (math.sqrt((additional_scaling *
+                    (GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING -
+                     params.m_Mean_Variance_Estimator__Gamma_Variance))) *
+             math.sqrt(
+                 ((params.m_Mean_Variance_Estimator___Std *
+                   (params.m_Mean_Variance_Estimator___Std /
+                    (GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING *
+                     additional_scaling))) +
+                  (((params.m_Mean_Variance_Estimator__Gamma_Variance *
+                     delta_sgp) /
+                    additional_scaling) *
+                   delta_sgp))))
+        params.m_Mean_Variance_Estimator___Mean = (params.m_Mean_Variance_Estimator___Mean +
+             ((params.m_Mean_Variance_Estimator__Gamma_Mean * delta_sgp) /
+              GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING))
