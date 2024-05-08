@@ -1,3 +1,38 @@
+'''
+The following python code is based solely on the original C code disctributed
+with following LICENCE
+
+/*
+ * Copyright (c) 2022, Sensirion AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of Sensirion AG nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+'''
 
 
 #Define Global variables
@@ -173,19 +208,19 @@ void GasIndexAlgorithm_get_tuning_parameters(
 '''
 
 def GasIndexAlgorithm_process(params: GasIndexAlgorithmParams, sraw: int) -> int:
-    #according to the original c code: value is returned via pointer int32_t* gas_index 
-    
+    #according to the original c code: value is returned via pointer int32_t* gas_index
+
     if params.mUptime <= GasIndexAlgorithm_INITIAL_BLACKOUT:
         params.mUptime = params.mUptime + params.mSamplingInterval
     else:
-        if (sraw > 0) and (sraw < 65000): 
+        if (sraw > 0) and (sraw < 65000):
             if (sraw < (params.mSraw_Minimum + 1)):
                 sraw = (params.mSraw_Minimum + 1)
-            elif (sraw > (params.mSraw_Minimum + 32767)): 
+            elif (sraw > (params.mSraw_Minimum + 32767)):
                 sraw = (params.mSraw_Minimum + 32767)
-            
+
             params.mSraw = float(sraw - params.mSraw_Minimum)
-        
+
         if ((params.mAlgorithm_Type ==
               GasIndexAlgorithm_ALGORITHM_TYPE_VOC) or
              GasIndexAlgorithm__mean_variance_estimator__is_initialized(params)):
@@ -193,21 +228,21 @@ def GasIndexAlgorithm_process(params: GasIndexAlgorithmParams, sraw: int) -> int
             params.mGas_Index = GasIndexAlgorithm__sigmoid_scaled__process(params, params.mGas_Index);
         else:
             params.mGas_Index = params.mIndex_Offset
-        
+
         params.mGas_Index = GasIndexAlgorithm__adaptive_lowpass__process(params, params.mGas_Index)
-        if (params.mGas_Index < 0.5): 
+        if (params.mGas_Index < 0.5):
             params.mGas_Index = 0.5
-        
+
         if (params.mSraw > 0.0):
             GasIndexAlgorithm__mean_variance_estimator__process(params,params.mSraw)
             GasIndexAlgorithm__mox_model__set_parameters(params,
             GasIndexAlgorithm__mean_variance_estimator__get_std(params),
                 GasIndexAlgorithm__mean_variance_estimator__get_mean(params))
-          
+
     gas_index = int(params.mGas_Index + 0.5)
     return gas_index
 
-    
+
 def GasIndexAlgorithm__mean_variance_estimator__set_parameters(params: GasIndexAlgorithmParams):
 
     params.m_Mean_Variance_Estimator___Initialized = False
@@ -221,19 +256,19 @@ def GasIndexAlgorithm__mean_variance_estimator__set_parameters(params: GasIndexA
     params.m_Mean_Variance_Estimator___Gamma_Variance = ((GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING *
           (params.mSamplingInterval / 3600.0)) /
          (params.mTau_Variance_Hours + (params.mSamplingInterval / 3600.0)))
-    if (params.mAlgorithm_Type == GasIndexAlgorithm_ALGORITHM_TYPE_NOX): 
+    if (params.mAlgorithm_Type == GasIndexAlgorithm_ALGORITHM_TYPE_NOX):
         params.m_Mean_Variance_Estimator___Gamma_Initial_Mean = (((GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING *
                GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING) *
               params.mSamplingInterval) /
              (GasIndexAlgorithm_TAU_INITIAL_MEAN_NOX +
               params.mSamplingInterval))
-    else: 
+    else:
         params.m_Mean_Variance_Estimator___Gamma_Initial_Mean = (((GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING *
                GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING) *
               params.mSamplingInterval) /
              (GasIndexAlgorithm_TAU_INITIAL_MEAN_VOC +
               params.mSamplingInterval))
-    
+
     params.m_Mean_Variance_Estimator___Gamma_Initial_Variance = ((GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING *
           params.mSamplingInterval) /
          (GasIndexAlgorithm_TAU_INITIAL_VARIANCE + params.mSamplingInterval))
@@ -244,7 +279,7 @@ def GasIndexAlgorithm__mean_variance_estimator__set_parameters(params: GasIndexA
     params.m_Mean_Variance_Estimator___Gating_Duration_Minutes = 0.0;
 
 
-def GasIndexAlgorithm__mean_variance_estimator__set_states(params: GasIndexAlgorithmParams, 
+def GasIndexAlgorithm__mean_variance_estimator__set_states(params: GasIndexAlgorithmParams,
         mean: float, std: float,  uptime_gamma: float):
 
     params._Mean_Variance_Estimator___Mean = mean
@@ -261,8 +296,5 @@ def GasIndexAlgorithm__mean_variance_estimator__get_mean(params: GasIndexAlgorit
     return (params.m_Mean_Variance_Estimator___Mean +
             params.m_Mean_Variance_Estimator___Sraw_Offset)
 
-def GasIndexAlgorithm__mean_variance_estimator__is_initialized(params: GasIndexAlgorithmParams) -> bool: 
+def GasIndexAlgorithm__mean_variance_estimator__is_initialized(params: GasIndexAlgorithmParams) -> bool:
     return params.m_Mean_Variance_Estimator___Initialized
-
-
-
