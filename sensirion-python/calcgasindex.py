@@ -298,3 +298,79 @@ def GasIndexAlgorithm__mean_variance_estimator__get_mean(params: GasIndexAlgorit
 
 def GasIndexAlgorithm__mean_variance_estimator__is_initialized(params: GasIndexAlgorithmParams) -> bool:
     return params.m_Mean_Variance_Estimator___Initialized
+
+
+def GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params: GasIndexAlgorithmParams):
+    '''
+    float uptime_limit;
+    float sigmoid_gamma_mean;
+    float gamma_mean;
+    float gating_threshold_mean;
+    float sigmoid_gating_mean;
+    float sigmoid_gamma_variance;
+    float gamma_variance;
+    float gating_threshold_variance;
+    float sigmoid_gating_variance;
+    '''
+
+    uptime_limit = (GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__FIX16_MAX - params.mSamplingInterval)
+
+    if params.m_Mean_Variance_Estimator___Uptime_Gamma < uptime_limit:
+        params.m_Mean_Variance_Estimator___Uptime_Gamma = (params.m_Mean_Variance_Estimator___Uptime_Gamma +
+             params.mSamplingInterval)
+
+    if params.m_Mean_Variance_Estimator___Uptime_Gating < uptime_limit:
+        params.m_Mean_Variance_Estimator___Uptime_Gating = (params.m_Mean_Variance_Estimator___Uptime_Gating +
+             params.mSamplingInterval)
+
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+        params, params.mInit_Duration_Mean,GasIndexAlgorithm_INIT_TRANSITION_MEAN)
+    sigmoid_gamma_mean = GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+            params, params.m_Mean_Variance_Estimator___Uptime_Gamma)
+    gamma_mean = (params.m_Mean_Variance_Estimator___Gamma_Mean +
+                  ((params.m_Mean_Variance_Estimator___Gamma_Initial_Mean -
+                    params.m_Mean_Variance_Estimator___Gamma_Mean) *
+                   sigmoid_gamma_mean))
+    gating_threshold_mean = (params.mGating_Threshold +
+         ((GasIndexAlgorithm_GATING_THRESHOLD_INITIAL -
+           params.mGating_Threshold) *
+          GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+              params, params.m_Mean_Variance_Estimator___Uptime_Gating)))
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+        params, gating_threshold_mean,
+        GasIndexAlgorithm_GATING_THRESHOLD_TRANSITION)
+    sigmoid_gating_mean = GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+            params, params.mGas_Index)
+    params.m_Mean_Variance_Estimator__Gamma_Mean = sigmoid_gating_mean * gamma_mean
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+        params, params.mInit_Duration_Variance,
+        GasIndexAlgorithm_INIT_TRANSITION_VARIANCE)
+    sigmoid_gamma_variance = GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+            params, params.m_Mean_Variance_Estimator___Uptime_Gamma)
+    gamma_variance = (params.m_Mean_Variance_Estimator___Gamma_Variance +
+         ((params.m_Mean_Variance_Estimator___Gamma_Initial_Variance -
+           params.m_Mean_Variance_Estimator___Gamma_Variance) *
+          (sigmoid_gamma_variance - sigmoid_gamma_mean)))
+    gating_threshold_variance = (params.mGating_Threshold +
+         ((GasIndexAlgorithm_GATING_THRESHOLD_INITIAL -
+           params.mGating_Threshold) *
+          GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+              params, params.m_Mean_Variance_Estimator___Uptime_Gating)))
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+        params, gating_threshold_variance,
+        GasIndexAlgorithm_GATING_THRESHOLD_TRANSITION)
+    sigmoid_gating_variance = GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+            params, params.mGas_Index)
+    params.m_Mean_Variance_Estimator__Gamma_Variance = sigmoid_gating_variance * gamma_variance
+    params.m_Mean_Variance_Estimator___Gating_Duration_Minutes = (params.m_Mean_Variance_Estimator___Gating_Duration_Minutes +
+         ((params.mSamplingInterval / 60.0) *
+          (((1.0 - sigmoid_gating_mean) *
+            (1.0 + GasIndexAlgorithm_GATING_MAX_RATIO)) -
+           GasIndexAlgorithm_GATING_MAX_RATIO)))
+
+    if params.m_Mean_Variance_Estimator___Gating_Duration_Minutes < 0.0:
+        params.m_Mean_Variance_Estimator___Gating_Duration_Minutes = 0.0
+
+    if (params.m_Mean_Variance_Estimator___Gating_Duration_Minutes >
+         params.mGating_Max_Duration_Minutes):
+        params.m_Mean_Variance_Estimator___Uptime_Gating = 0.0
