@@ -463,3 +463,34 @@ def GasIndexAlgorithm__mox_model__process(params: GasIndexAlgorithmParams,
                  (-1.0 * (params.m_Mox_Model__Sraw_Std +
                           GasIndexAlgorithm_SRAW_STD_BONUS_VOC))) *
                 params.mIndex_Gain)
+
+def GasIndexAlgorithm__sigmoid_scaled__set_parameters(params: GasIndexAlgorithmParams,
+        X0: float , K: float, offset_default: float):
+    params.m_Sigmoid_Scaled__K = K
+    params.m_Sigmoid_Scaled__X0 = X0
+    params.m_Sigmoid_Scaled__Offset_Default = offset_default
+
+
+def GasIndexAlgorithm__sigmoid_scaled__process(params: GasIndexAlgorithmParams,
+                                           sample: float) -> float:
+
+    x = params.m_Sigmoid_Scaled__K * (sample - params.m_Sigmoid_Scaled__X0)
+    if ((x < -50.0)):
+        return GasIndexAlgorithm_SIGMOID_L
+    elif ((x > 50.0)):
+        return 0.0;
+    else:
+        if ((sample >= 0.0)):
+            if ((params.m_Sigmoid_Scaled__Offset_Default == 1.0)):
+                shift = ((500.0 / 499.0) * (1.0 - params.mIndex_Offset))
+            else:
+                shift = ((GasIndexAlgorithm_SIGMOID_L -
+                          (5.0 * params.mIndex_Offset)) /
+                         4.0)
+
+            return (((GasIndexAlgorithm_SIGMOID_L + shift) / (1.0 + math.exp(x))) -
+                    shift)
+        else:
+            return ((params.mIndex_Offset /
+                     params.m_Sigmoid_Scaled__Offset_Default) *
+                    (GasIndexAlgorithm_SIGMOID_L / (1.0 + math.exp(x))));
