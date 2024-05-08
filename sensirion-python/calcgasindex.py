@@ -432,3 +432,15 @@ def GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
 
     params.m_Mean_Variance_Estimator___Sigmoid__K = K
     params.m_Mean_Variance_Estimator___Sigmoid__X0 = X0
+
+def GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+    params: GasIndexAlgorithmParams, sample: float) -> float:
+
+    x = (params.m_Mean_Variance_Estimator___Sigmoid__K *
+         (sample - params.m_Mean_Variance_Estimator___Sigmoid__X0))
+    if x < -50.0:
+        return 1.0;
+    elif x > 50.0:
+        return 0.0
+    else:
+        return (1.0 / (1.0 + math.exp(x)))
