@@ -478,7 +478,7 @@ def GasIndexAlgorithm__sigmoid_scaled__process(params: GasIndexAlgorithmParams,
     if ((x < -50.0)):
         return GasIndexAlgorithm_SIGMOID_L
     elif ((x > 50.0)):
-        return 0.0;
+        return 0.0
     else:
         if ((sample >= 0.0)):
             if ((params.m_Sigmoid_Scaled__Offset_Default == 1.0)):
@@ -493,4 +493,11 @@ def GasIndexAlgorithm__sigmoid_scaled__process(params: GasIndexAlgorithmParams,
         else:
             return ((params.mIndex_Offset /
                      params.m_Sigmoid_Scaled__Offset_Default) *
-                    (GasIndexAlgorithm_SIGMOID_L / (1.0 + math.exp(x))));
+                    (GasIndexAlgorithm_SIGMOID_L / (1.0 + math.exp(x))))
+
+def GasIndexAlgorithm__adaptive_lowpass__set_parameters(params: GasIndexAlgorithmParams):
+    params.m_Adaptive_Lowpass__A1 = (params.mSamplingInterval /
+         (GasIndexAlgorithm_LP_TAU_FAST + params.mSamplingInterval))
+    params.m_Adaptive_Lowpass__A2 = (params.mSamplingInterval /
+         (GasIndexAlgorithm_LP_TAU_SLOW + params.mSamplingInterval))
+    params.m_Adaptive_Lowpass___Initialized = False
