@@ -501,3 +501,32 @@ def GasIndexAlgorithm__adaptive_lowpass__set_parameters(params: GasIndexAlgorith
     params.m_Adaptive_Lowpass__A2 = (params.mSamplingInterval /
          (GasIndexAlgorithm_LP_TAU_SLOW + params.mSamplingInterval))
     params.m_Adaptive_Lowpass___Initialized = False
+
+
+def GasIndexAlgorithm__adaptive_lowpass__process(params: GasIndexAlgorithmParams,
+                                             sample: float) -> float:
+    if params.m_Adaptive_Lowpass___Initialized == False:
+        params.m_Adaptive_Lowpass___X1 = sample
+        params.m_Adaptive_Lowpass___X2 = sample
+        params.m_Adaptive_Lowpass___X3 = sample
+        params.m_Adaptive_Lowpass___Initialized = True
+
+    params.m_Adaptive_Lowpass___X1 = (((1.0 - params.m_Adaptive_Lowpass__A1) *
+          params.m_Adaptive_Lowpass___X1) +
+         (params.m_Adaptive_Lowpass__A1 * sample))
+    params.m_Adaptive_Lowpass___X2 = (((1.0 - params.m_Adaptive_Lowpass__A2) *
+          params.m_Adaptive_Lowpass___X2) +
+         (params.m_Adaptive_Lowpass__A2 * sample))
+
+    abs_delta = params.m_Adaptive_Lowpass___X1 - params.m_Adaptive_Lowpass___X2
+    if abs_delta < 0.0:
+        abs_delta = -1.0 * abs_delta
+
+    F1 = math.exp(GasIndexAlgorithm_LP_ALPHA * abs_delta)
+    tau_a = (((GasIndexAlgorithm_LP_TAU_SLOW - GasIndexAlgorithm_LP_TAU_FAST) *
+              F1) +
+             GasIndexAlgorithm_LP_TAU_FAST)
+    a3 = params.mSamplingInterval / (params.mSamplingInterval + tau_a)
+    params.m_Adaptive_Lowpass___X3 = (((1.0 - a3) * params.m_Adaptive_Lowpass___X3)
+            + (a3 * sample))
+    return params.m_Adaptive_Lowpass___X3
