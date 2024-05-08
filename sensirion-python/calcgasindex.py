@@ -439,7 +439,7 @@ def GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
     x = (params.m_Mean_Variance_Estimator___Sigmoid__K *
          (sample - params.m_Mean_Variance_Estimator___Sigmoid__X0))
     if x < -50.0:
-        return 1.0;
+        return 1.0
     elif x > 50.0:
         return 0.0
     else:
@@ -450,3 +450,16 @@ def GasIndexAlgorithm__mox_model__set_parameters(params: GasIndexAlgorithmParams
                                 SRAW_STD: float, SRAW_MEAN: float):
     params.m_Mox_Model__Sraw_Std = SRAW_STD
     params.m_Mox_Model__Sraw_Mean = SRAW_MEAN
+
+
+def GasIndexAlgorithm__mox_model__process(params: GasIndexAlgorithmParams,
+                                sraw: float) -> float:
+    if ((params.mAlgorithm_Type == GasIndexAlgorithm_ALGORITHM_TYPE_NOX)):
+        return (((sraw - params.m_Mox_Model__Sraw_Mean) /
+                 GasIndexAlgorithm_SRAW_STD_NOX) *
+                params.mIndex_Gain)
+    else:
+        return (((sraw - params.m_Mox_Model__Sraw_Mean) /
+                 (-1.0 * (params.m_Mox_Model__Sraw_Std +
+                          GasIndexAlgorithm_SRAW_STD_BONUS_VOC))) *
+                params.mIndex_Gain)
