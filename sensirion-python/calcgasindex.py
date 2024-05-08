@@ -424,3 +424,11 @@ def GasIndexAlgorithm__mean_variance_estimator__process(params: GasIndexAlgorith
         params.m_Mean_Variance_Estimator___Mean = (params.m_Mean_Variance_Estimator___Mean +
              ((params.m_Mean_Variance_Estimator__Gamma_Mean * delta_sgp) /
               GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING))
+
+
+
+def GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+    params: GasIndexAlgorithmParams, X0: float , K: float):
+
+    params.m_Mean_Variance_Estimator___Sigmoid__K = K
+    params.m_Mean_Variance_Estimator___Sigmoid__X0 = X0
