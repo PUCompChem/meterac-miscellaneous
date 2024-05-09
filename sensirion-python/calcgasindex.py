@@ -99,7 +99,7 @@ class GasIndexAlgorithmParams:
         pass
 
     def __str__(self):
-        pass
+        return "GasIndexAlgorithmParams"        
 
 
 def GasIndexAlgorithm_init_with_sampling_interval(params: GasIndexAlgorithmParams,

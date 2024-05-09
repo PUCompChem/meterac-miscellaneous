@@ -11,10 +11,13 @@ class TaskType:
 class VOCTestParams:
     def __init__(self):
         self.fileName = "test.csv"
-        self.numberOfPoints = 5
+        self.startRow = 2
+        self.endRow = 1000000000
         self.samplingInterval = 300
         self.csvVOCRawColumn = 1
-        pass
+        self.csvVOCIndexColumn = 2
+        self.vocParams = GasIndexAlgorithmParams()
+
 
 def printDictionaty(d: dict):
     for k in d.keys():
@@ -44,8 +47,13 @@ def lineAction(lineNum:int, line: [], taskType :int, manageInfoObj: object):
 
 def lineAction_CALC_GAS_INDEX(lineNum:int, line: [], vtp: VOCTestParams):
     k = vtp.csvVOCRawColumn
-    print(line[k])
-    pass
+    l = vtp.csvVOCIndexColumn
+
+    vocRaw = float(line[k])
+    vocIndex = int(line[l])
+    calcVocIndex = GasIndexAlgorithm_process(vtp.vocParams, vocRaw)
+    print(vocRaw, "  ", vocIndex, "  ", calcVocIndex, "   diff =", (vocIndex-calcVocIndex))
+
 
 
 def testVOCIndex(vtp: VOCTestParams):
@@ -55,7 +63,13 @@ def testVOCIndex(vtp: VOCTestParams):
 
     #Initialization
     print("Initialization")
-    voc_params = GasIndexAlgorithmParams()
+    print("--------------")
+    voc_params = vtp.vocParams
     GasIndexAlgorithm_init_with_sampling_interval(voc_params,
             GasIndexAlgorithm_ALGORITHM_TYPE_VOC, vtp.samplingInterval)
     printDictionaty(voc_params.__dict__)
+    print()
+    #Iteration
+    print("Iteration")
+    print("--------------")
+    iterateCsvFile(vtp.fileName, TaskType.CALC_GAS_INDEX, vtp, vtp.startRow, vtp.endRow)
