@@ -13,13 +13,15 @@ class VOCTestParams:
         self.fileName = "test.csv"
         self.numberOfPoints = 5
         self.samplingInterval = 300
+        self.csvVOCRawColumn = 1
         pass
 
 def printDictionaty(d: dict):
     for k in d.keys():
         print(k, " = " ,d[k])
 
-def iterateCsvFile(fileName: str, taskType: int, startLineNumber = 1, maxLineNumber = 1000000000):
+def iterateCsvFile(fileName: str, taskType: int, manageInfoObj: object,
+    startLineNumber = 1, maxLineNumber = 1000000000):
     with open(fileName, mode ='r') as file:
         csvFile = csv.reader(file)
         n = 0
@@ -29,15 +31,21 @@ def iterateCsvFile(fileName: str, taskType: int, startLineNumber = 1, maxLineNum
                 continue
             if (n > maxLineNumber):
                 break
-            lineAction(n, line, taskType)
+            lineAction(n, line, taskType, manageInfoObj)
 
 
-def lineAction(n:int, line: [], taskType :int):
+def lineAction(lineNum:int, line: [], taskType :int, manageInfoObj: object):
     if taskType == TaskType.PRINT:
         print(line)
     elif taskType ==TaskType.CALC_GAS_INDEX:
-        #TODO
+        lineAction_CALC_GAS_INDEX(lineNum, line, manageInfoObj)
         pass
+
+
+def lineAction_CALC_GAS_INDEX(lineNum:int, line: [], vtp: VOCTestParams):
+    k = vtp.csvVOCRawColumn
+    print(line[k])
+    pass
 
 
 def testVOCIndex(vtp: VOCTestParams):
