@@ -16,6 +16,9 @@ class VOCTestParams:
         self.samplingInterval = 300
         self.csvVOCRawColumn = 1
         self.csvVOCIndexColumn = 2
+        self.reportInCSVFormat = False
+        self.reportTABDelimeter = False
+        self.reportInternalStateParams = False
         self.vocParams = GasIndexAlgorithmParams()
 
 
@@ -48,13 +51,41 @@ def lineAction(lineNum:int, line: [], taskType :int, manageInfoObj: object):
 def lineAction_CALC_GAS_INDEX(lineNum:int, line: [], vtp: VOCTestParams):
     k = vtp.csvVOCRawColumn
     l = vtp.csvVOCIndexColumn
-
     vocRaw = float(line[k])
     vocIndex = int(line[l])
     calcVocIndex = GasIndexAlgorithm_process(vtp.vocParams, vocRaw)
-    print(vocRaw, "  ", vocIndex, "  ", calcVocIndex, "   diff =", (vocIndex-calcVocIndex))
+    #print(vocRaw, "  ", vocIndex, "  ", calcVocIndex, "   diff =", (vocIndex-calcVocIndex))
+    print(getVOCReportLine(vtp, vocRaw, vocIndex, calcVocIndex))
 
 
+def getDelimiter(vtp: VOCTestParams) -> str:
+    if vtp.reportInCSVFormat:
+        delim = ','
+    else:
+        if vtp.reportTABDelimeter:
+            delim = '\t'
+        else: 
+            delim = '  '
+    return delim
+    
+    
+def getVOCReportLine(vtp: VOCTestParams, vocRaw: float, vocIndex: int, calcVocIndex: int) -> str:
+    
+    delim = getDelimiter(vtp)
+    report = str(vocRaw) + delim + str(vocIndex) + delim + str(calcVocIndex)
+    report += (delim + str(vocIndex-calcVocIndex)) 
+    
+    if vtp.reportInternalStateParams:
+        pass
+        
+    return report
+
+
+def getVOCReportHeader(vtp: VOCTestParams) -> str:
+    delim = getDelimiter(vtp)
+    report = 'vocRaw' + delim + 'vocIndex' + delim + 'calcVocIndex' + delim + 'diff'
+    return report
+    
 
 def testVOCIndex(vtp: VOCTestParams):
     print("Testing VOC index")
@@ -72,4 +103,5 @@ def testVOCIndex(vtp: VOCTestParams):
     #Iteration
     print("Iteration")
     print("--------------")
+    print(getVOCReportHeader(vtp))
     iterateCsvFile(vtp.fileName, TaskType.CALC_GAS_INDEX, vtp, vtp.startRow, vtp.endRow)
