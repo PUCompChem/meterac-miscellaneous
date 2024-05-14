@@ -20,7 +20,16 @@ class VOCTestParams:
         self.reportTABDelimeter = False
         self.reportInternalStateParams = False
         self.vocParams = GasIndexAlgorithmParams()
-
+        self.doSubIterations = False
+        self.numberOfSubIteration = 10
+        self.setCalculationSamplingInterval()
+                
+    def setCalculationSamplingInterval(self):
+        if self.doSubIterations:
+            self.calculationSamplingInterval = float(1.0 * self.samplingInterval / numberOfSubIteration)
+        else:
+            self.calculationSamplingInterval = float(self.samplingInterval)
+            
 
 def printDictionaty(d: dict):
     for k in d.keys():
@@ -69,8 +78,7 @@ def getDelimiter(vtp: VOCTestParams) -> str:
     return delim
     
     
-def getVOCReportLine(vtp: VOCTestParams, vocRaw: float, vocIndex: int, calcVocIndex: int) -> str:
-    
+def getVOCReportLine(vtp: VOCTestParams, vocRaw: float, vocIndex: int, calcVocIndex: int) -> str:    
     delim = getDelimiter(vtp)
     report = str(vocRaw) + delim + str(vocIndex) + delim + str(calcVocIndex)
     report += (delim + str(vocIndex-calcVocIndex)) 
