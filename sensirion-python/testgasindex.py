@@ -21,12 +21,12 @@ class VOCTestParams:
         self.reportInternalStateParams = False
         self.vocParams = GasIndexAlgorithmParams()
         self.doSubIterations = False
-        self.numberOfSubIteration = 10
+        self.numberOfSubIterations = 10
         self.setCalculationSamplingInterval()
                 
     def setCalculationSamplingInterval(self):
         if self.doSubIterations:
-            self.calculationSamplingInterval = float(1.0 * self.samplingInterval / numberOfSubIteration)
+            self.calculationSamplingInterval = float(1.0 * self.samplingInterval / self.numberOfSubIterations)
         else:
             self.calculationSamplingInterval = float(self.samplingInterval)
             
@@ -62,7 +62,12 @@ def lineAction_CALC_GAS_INDEX(lineNum:int, line: [], vtp: VOCTestParams):
     l = vtp.csvVOCIndexColumn
     vocRaw = float(line[k])
     vocIndex = int(line[l])
-    calcVocIndex = GasIndexAlgorithm_process(vtp.vocParams, vocRaw)
+    if vtp.doSubIterations:
+        for i in range(vtp.numberOfSubIterations):
+            calcVocIndex = GasIndexAlgorithm_process(vtp.vocParams, vocRaw)
+    else:
+        calcVocIndex = GasIndexAlgorithm_process(vtp.vocParams, vocRaw)
+    
     #print(vocRaw, "  ", vocIndex, "  ", calcVocIndex, "   diff =", (vocIndex-calcVocIndex))
     print(getVOCReportLine(vtp, vocRaw, vocIndex, calcVocIndex))
 
@@ -105,7 +110,7 @@ def testVOCIndex(vtp: VOCTestParams):
     print("--------------")
     voc_params = vtp.vocParams
     GasIndexAlgorithm_init_with_sampling_interval(voc_params,
-            GasIndexAlgorithm_ALGORITHM_TYPE_VOC, vtp.samplingInterval)
+            GasIndexAlgorithm_ALGORITHM_TYPE_VOC, vtp.calculationSamplingInterval)
     printDictionaty(voc_params.__dict__)
     print()
     #Iteration
