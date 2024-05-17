@@ -89,16 +89,28 @@ def getVOCReportLine(vtp: VOCTestParams, vocRaw: float, vocIndex: int, calcVocIn
     report += (delim + str(vocIndex-calcVocIndex)) 
     
     if vtp.reportInternalStateParams:
-        pass
-        
+        report += delim + getInternalStateParamsReport(vtp)
+                
     return report
 
 
 def getVOCReportHeader(vtp: VOCTestParams) -> str:
     delim = getDelimiter(vtp)
     report = 'vocRaw' + delim + 'vocIndex' + delim + 'calcVocIndex' + delim + 'diff'
+    if vtp.reportInternalStateParams:
+        report += delim + getInternalStateParamsReportHeader(vtp)
     return report
     
+def getInternalStateParamsReportHeader(vtp: VOCTestParams) -> str:
+    delim = getDelimiter(vtp)
+    report = 'mIndex_Offset' + delim + 'mSraw_Minimum' + delim + 'mGating_Max_Duration_Minutes'
+    return report
+
+def getInternalStateParamsReport(vtp: VOCTestParams) -> str:
+    delim = getDelimiter(vtp)
+    p = vtp.vocParams #internal state params
+    report = str(p.mIndex_Offset) + delim + str(p.mSraw_Minimum) + delim + str(p.mGating_Max_Duration_Minutes)
+    return report
 
 def testVOCIndex(vtp: VOCTestParams):
     print("Testing VOC index")
