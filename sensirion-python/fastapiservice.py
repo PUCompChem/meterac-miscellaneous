@@ -1,22 +1,26 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from calcgasindex import *
+from datetime import datetime
 
 
 class Node(BaseModel):
     name: str
+    vocParams:GasIndexAlgorithmParams = GasIndexAlgorithmParams()
+    noxParams:GasIndexAlgorithmParams = GasIndexAlgorithmParams()
     class Config:
         arbitrary_types_allowed = True
 
-nodes = []
+nodes = {}
 
 
 def debugInit():
     print("Debug Init: adding two demo nodes")
-    nodes.append(Node(name = "N00T1"))
-    nodes.append(Node(name = "N00T2"))
+    nodes["N00T1"] = Node(name = "N00T1")
+    nodes["N00T2"] = Node(name = "N00T2")
 
 def startup():
-    print("API startup ---- ")
+    print("API startup ---- ", datetime.now(), datetime.utcnow())
     debugInit()
 
 def shutdown():
@@ -36,3 +40,9 @@ def nodecount():
     count = len(nodes)
     return {"NodeCount": count}
     #return count
+    
+@app.get("/nodelist")
+def nodelist():
+    #Test code
+    return nodes["N00T1"].name
+    
