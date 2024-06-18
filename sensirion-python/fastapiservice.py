@@ -4,6 +4,7 @@ from calcgasindex import *
 from datetime import datetime
 
 
+
 class Node(BaseModel):
     name: str
     vocParams:GasIndexAlgorithmParams = GasIndexAlgorithmParams()
@@ -11,8 +12,8 @@ class Node(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-nodes = {}
-
+def init():
+    debugInit()
 
 def debugInit():
     print("Debug Init: adding two demo nodes")
@@ -21,7 +22,7 @@ def debugInit():
 
 def startup():
     print("API startup ---- ", datetime.now(), datetime.utcnow())
-    debugInit()
+    init()
 
 def shutdown():
     print("API shutdown ---- ")
@@ -30,6 +31,7 @@ app = FastAPI()
 app.add_event_handler('startup', startup)
 app.add_event_handler('shutdown', shutdown)
 
+nodes = {}
 
 @app.get("/")
 def root():
