@@ -3,7 +3,9 @@ from pydantic import BaseModel
 from calcgasindex import *
 from datetime import datetime
 
-
+class ServerConfig(BaseModel):
+    nodeFolder: str = "./nodes"
+    
 
 class Node(BaseModel):
     name: str
@@ -13,8 +15,12 @@ class Node(BaseModel):
         arbitrary_types_allowed = True
 
 def init():
+    loadConfigFile()
     debugInit()
-
+    
+def loadConfigFile():
+    print("Loading server configuration ...")
+    
 def debugInit():
     print("Debug Init: adding two demo nodes")
     nodes["N00T1"] = Node(name = "N00T1")
