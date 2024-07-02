@@ -45,12 +45,18 @@ def root():
 
 @app.get("/nodecount")
 def nodecount():
-    count = len(nodes)
-    return {"NodeCount": count}
-    #return count
-    
+    return {"NodeCount": getNodeCount()}
+
+@app.get("/nodecount/obj")
+def nodecount_obj():
+    return getNodeCount()
+
 @app.get("/nodelist")
 def nodelist():
     #Test code
     return nodes["N00T1"].name
     
+#----------------------------------------
+
+def getNodeCount() -> int:
+    return len(nodes)
