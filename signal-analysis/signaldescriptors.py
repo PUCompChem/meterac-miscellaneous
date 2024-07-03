@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator
-
+import numpy as np
 
 
 allowed_descriptor_types = ["number", "list"]
@@ -21,6 +21,7 @@ class DescriptorValue(BaseModel):
     errorMsg: str = None
     info: str = None
 
+
 class CalcSignalDescriptors(BaseModel):
     signal: list[float] = None
     descriptors: list[str] = None
@@ -31,6 +32,11 @@ class CalcSignalDescriptors(BaseModel):
         return None
     
     def calculateDescriptor(self, name: str) -> DescriptorValue:       
+        if name == "mean":
+            return self.calculateMean()
         #TODO
-        return DescriptorValue()
+        return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
         
+    def calculateMean(self) -> DescriptorValue:
+        val = np.mean(self.signal)
+        return DescriptorValue(floatValue = val)
