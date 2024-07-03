@@ -1,6 +1,5 @@
 
 import csv
-from typing import List
 from calcgasindex import *
 
 
@@ -50,7 +49,7 @@ def iterateCsvFile(fileName: str, taskType: int, manageInfoObj: object,
             lineAction(n, line, taskType, manageInfoObj)
 
 
-def lineAction(lineNum:int, line: List[str], taskType :int, manageInfoObj: object):
+def lineAction(lineNum:int, line: list[str], taskType :int, manageInfoObj: object):
     if taskType == TaskType.PRINT:
         print(line)
     elif taskType ==TaskType.CALC_GAS_INDEX:
@@ -58,7 +57,7 @@ def lineAction(lineNum:int, line: List[str], taskType :int, manageInfoObj: objec
         pass
 
 
-def lineAction_CALC_GAS_INDEX(lineNum:int, line: List[str], vtp: VOCTestParams):
+def lineAction_CALC_GAS_INDEX(lineNum:int, line: list[str], vtp: VOCTestParams):
     k = vtp.csvVOCRawColumn
     l = vtp.csvVOCIndexColumn
     vocRaw = float(line[k])
