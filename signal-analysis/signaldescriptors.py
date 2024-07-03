@@ -15,17 +15,22 @@ class Descriptor(BaseModel):
         assert v in allowed_descriptor_types , "must be in " + str(allowed_descriptor_types)
         return v
 
+class DescriptorValue(BaseModel):
+    floatValue: float =  None
+    listValue: float = None
+    errorMsg: str = None
+    info: str = None
 
 class CalcSignalDescriptors(BaseModel):
     signal: list[float] = None
     descriptors: list[str] = None
         
-    def calculate(self) -> dict[str, float]:
+    def calculate(self) -> dict[str, DescriptorValue]:
         #TODO
         print("TBD")
         return None
     
-    def calculateDescriptor(self, name: str) -> float | list[float]:
+    def calculateDescriptor(self, name: str) -> DescriptorValue:       
         #TODO
-        return 0.0
+        return DescriptorValue()
         
