@@ -1,6 +1,12 @@
+from pydantic import BaseModel
 
 
-class CalcSignalDescriptors:
-    def __init__(self):
-        self.signal = None
+
+class CalcSignalDescriptors(BaseModel):
+    signal: list[float] = None
+    descriptors: list[str] = None
         
+    def calculate(self) -> dict[str, float]:
+        #TODO
+        print("TBD")
+        return None
