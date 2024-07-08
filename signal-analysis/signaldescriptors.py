@@ -17,7 +17,7 @@ class Descriptor(BaseModel):
 
 class DescriptorValue(BaseModel):
     floatValue: float =  None
-    listValue: float = None
+    listValue: list[float] = None
     errorMsg: str = None
     info: str = None
 
