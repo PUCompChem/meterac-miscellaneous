@@ -34,9 +34,15 @@ class CalcSignalDescriptors(BaseModel):
     def calculateDescriptor(self, name: str) -> DescriptorValue:       
         if name == "mean":
             return self.calculateMean()
-        #TODO
+        if name == "rms":
+            return self.calculateRMS()        
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
         
     def calculateMean(self) -> DescriptorValue:
         val = np.mean(self.signal)
+        return DescriptorValue(floatValue = val)
+
+    def calculateRMS(self) -> DescriptorValue:
+        arr = np.array(self.signal)
+        val = np.sqrt(np.mean(arr**2))
         return DescriptorValue(floatValue = val)
