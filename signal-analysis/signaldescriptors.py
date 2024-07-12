@@ -15,6 +15,11 @@ class Descriptor(BaseModel):
         assert v in allowed_descriptor_types , "must be in " + str(allowed_descriptor_types)
         return v
 
+descriptor_list = [
+    Descriptor(name = "mean"),
+    Descriptor(name = "rms")
+    ]
+
 class DescriptorValue(BaseModel):
     floatValue: float =  None
     listValue: list[float] = None
