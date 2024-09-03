@@ -4,7 +4,7 @@ def readFloatValuesFromTextFile(fileName : str) -> list[float]:
     with open(fileName) as f:
         lines = f.readlines()
 
-    values = [str]
+    values = []
     for line in lines:
         values.append(float(line))
     return values
