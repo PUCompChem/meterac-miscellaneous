@@ -6,7 +6,7 @@ if len(sys.argv) < 2:
     print("Requires a file name")
     sys.exit()
 
-values = readFloatValuesFromTextFile(sys.argv[1])
+values = readFloatValuesFromSingleLineTextFile(sys.argv[1])
 #print(values)
 
 
