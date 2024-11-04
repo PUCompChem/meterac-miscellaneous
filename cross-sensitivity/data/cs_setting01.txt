@@ -1,1 +1,6 @@
 num_sensors = 5
+
+sensor01 = semsor 1
+
+
+cs01 = 0.1 0.2 0.3 0.4 0.5
