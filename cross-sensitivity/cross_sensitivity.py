@@ -1,5 +1,10 @@
 
+class CSCalcData:
 
+    def __init__(self):        
+        self.cs = None
+        
+        
 def load_properties(filepath):   
     props = {}
     with open(filepath, "rt") as f:
@@ -15,3 +20,24 @@ def load_properties(filepath):
                     props[key] = value 
     return props
 
+
+def parse_properties(props) -> CSCalcData:
+    cscd = CSCalcData()
+    #TODO
+    return cscd
+    
+
+def calc_work_matrix(cscd: CSCalcData):
+    pass
+ 
+ 
+def calc_inv_matrix(cscd: CSCalcData):
+    pass
+ 
+    
+def calc_concentrations(v: list[float]):
+    pass
+    
+    
+    
+    
