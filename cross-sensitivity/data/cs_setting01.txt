@@ -1,4 +1,4 @@
-num_of_sensors = 5ttt
+num_of_sensors = 5
 
 sensor_1 = CO
 sensor_2 = SO2

@@ -2,6 +2,8 @@
 class CSCalcData:
 
     def __init__(self):        
+        self.num_of_sensors = None
+        self.sensors = None
         self.cs = None
         
         
@@ -23,7 +25,38 @@ def load_properties(filepath):
 
 def parse_properties(props) -> CSCalcData:
     cscd = CSCalcData()
-    #TODO
+    errors = []
+
+    num_of_sensors_prop = props.get("num_of_sensors")
+    if (num_of_sensors_prop!= None):
+        try:
+            ns = int(num_of_sensors_prop)
+        except Exception as e:
+            errors.append("num_of_sensors is not correct integer: " + num_of_sensors_prop)
+        else:
+            cscd.num_of_sensors = ns
+    else:    
+        errors.append("Property 'num_of_sensors' is missing")
+
+    n = cscd.num_of_sensors
+    if (n != None):
+        #Parse sensor names
+        cscd.sensors = []
+        for i in range(n):
+            pname = "sensor_" + str(i+1)
+            p = props.get(pname)
+            cscd.sensors.append(p)
+            print(cscd.sensors[i])
+            if (p == None):
+                errors.append("Property '" + pname + "' is missing")
+
+    #Handle property parsing errors as an excpetion
+    if len(errors) > 0:
+        errorMsg = "There are property parsing errors:\n"
+        for err in errors:
+            errorMsg += "  " + err + "\n"
+        raise Exception(errorMsg)
+    
     return cscd
     
 
