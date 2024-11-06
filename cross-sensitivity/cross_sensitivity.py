@@ -122,7 +122,7 @@ def calc_inv_work_matrix(cscd: CSCalcData):
     cscd.invA = invA    
 
 
-def calc_b_matrix(cscd: CSCalcData):
+def calc_b_matrix(voltages: list[float], temp:float, cscd: CSCalcData):
     pass
 
 
@@ -130,7 +130,7 @@ def solve_system(cscd: CSCalcData):
     pass 
 
 
-def calc_concentrations(voltages: list[float], cscd: CSCalcData):
+def calc_concentrations(voltages: list[float], temp:float, cscd: CSCalcData):
     pass
 
 
