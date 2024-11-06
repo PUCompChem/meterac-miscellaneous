@@ -135,10 +135,12 @@ def calc_concentrations(voltages: list[float], cscd: CSCalcData):
 
 
 def outputCSResult(cscd: CSCalcData, sep: str):
-    print("Working matrix A")
+    print("Working matrix (A)")
     printMatrix(cscd.A, sep)
-    print("Working matrix invA")
+    print()
+    print("Inverse working matrix (invA)")
     printMatrix(cscd.invA, sep)
+    print()
 
 
 def printMatrix(M:np.array, sep:str):
@@ -149,5 +151,5 @@ def printMatrix(M:np.array, sep:str):
             line += str(M[i][j])
             if j < n-1:
                 line +=(sep)
-        print(line + "\n")
+        print(line)
     
