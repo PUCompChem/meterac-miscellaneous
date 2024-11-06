@@ -1,14 +1,44 @@
 num_of_sensors = 5
 
+#Sensors
 sensor_1 = CO
 sensor_2 = SO2
 sensor_3 = H2S
 sensor_4 = O3
 sensor_5 = NO2
 
+#Cross-sensitivity matrix
 cs_1 = 1, 0.05, 0.04, 0.2, 0.1
 cs_2 = 0.0182, 1, 5.692, 0.66, 0.14
 cs_3 = 0.027, 0.085, 1, -0.18, -0.2
 cs_4 = 0.0001, 0, -0.5, 1, 0
 cs_5 = 0.0002, 0.005, -0.232, -0.1, 1
+
+#Resistance in KOms
+R1 = 100
+R2 = 100
+R3 = 50
+R4 = 500
+R5 = 500
+
+#Individual Code of Sensitivity
+ICS1 = 1
+ICS2 = 1
+ICS3 = 1
+ICS4 = 1
+ICS5 = 1
+
+#Temperature Coefficient of Span (interpolated as a polynomial)
+TCS1 = 0.8762, 0.0073, -7E-05
+TCS2 = 0.7897, 0.0107, -7E-05
+TCS3 = 0.9442, 0.0037, -5E-05
+TCS4 = 0.9126, 0.0031, 2E-05, -3E-07
+TCS5 = 1
+
+#Zero Shift (interpolated as a polynomial)
+ZS1 = 1
+ZS2 = 1
+ZS3 = 1
+ZS4 = 1
+ZS5 = 1
 
