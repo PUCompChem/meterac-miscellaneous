@@ -50,6 +50,31 @@ def parse_properties(props) -> CSCalcData:
             if (p == None):
                 errors.append("Property '" + pname + "' is missing")
 
+        #Parse cross-sensitivity matrix (properties cs_1, cs_2,...)
+        cscd.cs = []
+        for i in range(n):
+            pname = "cs_" + str(i+1)
+            p = props.get(pname)
+            tokens = p.split(",")
+            values = []
+            if len(tokens) != n:
+                errors.append("Incorrect number of values in '" + pname + "': " + str(len(tokens))
+                              + ". It must be " + str(n))
+            else:
+                for tok in tokens:
+                    t = tok.strip()
+                    v = None
+                    if t == '':
+                        errors.append("There is an empty token in '" + pname + "'") 
+                    else:    
+                        try:
+                           v = float(t) 
+                        except Exception as e:
+                           errors.append("Incorrect float token in '" + pname + "': " + t)                        
+                        values.append(v)
+                                        
+                cscd.cs.append(values)
+
     #Handle property parsing errors as an excpetion
     if len(errors) > 0:
         errorMsg = "There are property parsing errors:\n"
