@@ -116,19 +116,38 @@ def calc_work_matrix(cscd: CSCalcData):
                 A[i][j] = -A[i][j]
     cscd.A = A
 
+
 def calc_inv_work_matrix(cscd: CSCalcData):
     invA = np.linalg.inv(cscd.A)
     cscd.invA = invA    
 
+
 def calc_b_matrix(cscd: CSCalcData):
     pass
+
 
 def solve_system(cscd: CSCalcData):
     pass 
 
+
 def calc_concentrations(voltages: list[float], cscd: CSCalcData):
     pass
-    
-    
-    
+
+
+def outputCSResult(cscd: CSCalcData, sep: str):
+    print("Working matrix A")
+    printMatrix(cscd.A, sep)
+    print("Working matrix invA")
+    printMatrix(cscd.invA, sep)
+
+
+def printMatrix(M:np.array, sep:str):
+    n = len(M)
+    for i in range(n):
+        line = ""
+        for j in range(n):
+            line += str(M[i][j])
+            if j < n-1:
+                line +=(sep)
+        print(line + "\n")
     
