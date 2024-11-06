@@ -5,9 +5,11 @@ class CSCalcData:
         self.num_of_sensors = None
         self.sensors = None
         self.cs = None
+        self.work_matrix = None
+        self.inverse_work_matrix = None
         
         
-def load_properties(filepath):   
+def load_properties(filepath: str):
     props = {}
     with open(filepath, "rt") as f:
         for line in f:
@@ -23,7 +25,7 @@ def load_properties(filepath):
     return props
 
 
-def parse_properties(props) -> CSCalcData:
+def parse_properties(props: dict) -> CSCalcData:
     cscd = CSCalcData()
     errors = []
 
@@ -46,7 +48,7 @@ def parse_properties(props) -> CSCalcData:
             pname = "sensor_" + str(i+1)
             p = props.get(pname)
             cscd.sensors.append(p)
-            print(cscd.sensors[i])
+            #print(cscd.sensors[i])
             if (p == None):
                 errors.append("Property '" + pname + "' is missing")
 
@@ -72,7 +74,7 @@ def parse_properties(props) -> CSCalcData:
                         except Exception as e:
                            errors.append("Incorrect float token in '" + pname + "': " + t)                        
                         values.append(v)
-                                        
+
                 cscd.cs.append(values)
 
     #Handle property parsing errors as an excpetion
