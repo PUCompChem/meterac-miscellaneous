@@ -1,13 +1,15 @@
+import numpy as np
 
 class CSCalcData:
-
     def __init__(self):        
         self.num_of_sensors = None
         self.sensors = None
-        self.cs = None
-        self.work_matrix = None
-        self.inverse_work_matrix = None
-        
+        self.cs = None              #list of lists (cross sensitivity matrix)
+        self.A = None               #numpy array with the working matrix
+        self.invA = None            #numpy array with the inverse wotking matrix
+        self.b = None               #numpy array with voltage scaled/processed matrix
+        self.C = None               #numpy array with caclualted concetrations
+
         
 def load_properties(filepath: str):
     props = {}
@@ -88,14 +90,43 @@ def parse_properties(props: dict) -> CSCalcData:
     
 
 def calc_work_matrix(cscd: CSCalcData):
+    '''
+    Calculatin a work matrix for solving a system of ecuations for { Ci | i = 1..n }
+        Ci = Vi/ICSi .TCSi(T).Ri  + ZSi(T) + Summa(CSij.Cj | for all j != i)
+
+    denote:
+        bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T) 
+
+    then the system is reformulated 
+        Ci = bi + Summa(CSij.Cj)
+
+    and additionally 
+        Ci - Summa(CSij.Cj) = bi  
+
+    Hence:
+        the working matrix is the CS matrix 
+        with reverse sign of the non diagonal elements      
+    '''
+
+    n = cscd.num_of_sensors
+    A = np.array(cscd.cs)    
+    for i in range(n):
+        for j in range(n):
+            if i!=j:
+                A[i][j] = -A[i][j]
+    cscd.A = A
+
+def calc_inv_work_matrix(cscd: CSCalcData):
+    invA = np.linalg.inv(cscd.A)
+    cscd.invA = invA    
+
+def calc_b_matrix(cscd: CSCalcData):
     pass
- 
- 
-def calc_inv_matrix(cscd: CSCalcData):
-    pass
- 
-    
-def calc_concentrations(v: list[float]):
+
+def solve_system(cscd: CSCalcData):
+    pass 
+
+def calc_concentrations(voltages: list[float], cscd: CSCalcData):
     pass
     
     
