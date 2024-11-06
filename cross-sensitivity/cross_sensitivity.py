@@ -3,8 +3,10 @@ import numpy as np
 class CSCalcData:
     def __init__(self):        
         self.num_of_sensors = None
-        self.sensors = None
+        self.sensors = None         #list of names (designations)
         self.cs = None              #list of lists (cross sensitivity matrix)
+        self.R = None               #list of float values (resistences in KOms)
+        self.ICS = None             #list of float values (Individual Codes of Sensitivity)
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.b = None               #numpy array with voltage scaled/processed matrix
@@ -78,6 +80,36 @@ def parse_properties(props: dict) -> CSCalcData:
                         values.append(v)
 
                 cscd.cs.append(values)
+      
+        #Parse resistances
+        cscd.R = []
+        for i in range(n):
+            pname = "R" + str(i+1)
+            p = props.get(pname)
+            if (p == None):
+                errors.append("Property '" + pname + "' is missing")
+            else:
+                v = None
+                try:
+                    v = float(p)
+                except Exception as e:
+                    errors.append("Incorrect float '" + pname + "': " + p)
+                cscd.R.append(v)
+
+        #Parse Individual Codes of Sensitivity
+        cscd.ICS = []
+        for i in range(n):
+            pname = "ICS" + str(i+1)
+            p = props.get(pname)
+            if (p == None):
+                errors.append("Property '" + pname + "' is missing")
+            else:
+                v = None
+                try:
+                    v = float(p)
+                except Exception as e:
+                    errors.append("Incorrect float '" + pname + "': " + p)
+                cscd.ICS.append(v)
 
     #Handle property parsing errors as an excpetion
     if len(errors) > 0:
