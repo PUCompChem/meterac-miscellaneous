@@ -6,7 +6,7 @@ class CSCalcData:
         self.sensors = None         #list of names (designations)
         self.cs = None              #list of lists (cross sensitivity matrix)
         self.R = None               #list of float values (resistences in KOms)
-        self.ICS = None             #list of float values (Individual Codes of Sensitivity)
+        self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of nodes)
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.b = None               #numpy array with voltage scaled/processed matrix
@@ -28,6 +28,28 @@ def load_properties(filepath: str):
                     props[key] = value 
     return props
 
+def load_ics_values(filepath: str, cscd: CSCalcData):
+    '''
+    File format
+    #info line
+    node, CO, SO2, H2S, O3, NO2
+    H40, 4.40, 32.76, 150.51, -37.39, -31.94
+    ...    
+    '''
+    ICSs = {}
+    with open(filepath, "rt") as f:
+        for line in f:
+            l = line.strip()
+            if l != '' and not l.startswith("#"):
+                n = n+1                               
+                tokens = l.split(",")
+                if len(tokens) != 2:
+                    continue
+                key = tokens[0].strip()
+                #value = tokens[1].strip()
+                #if key != '' and value != '': 
+                #    props[key] = value
+    
 
 def parse_properties(props: dict) -> CSCalcData:
     cscd = CSCalcData()
@@ -112,7 +134,7 @@ def parse_properties(props: dict) -> CSCalcData:
                     errors.append("Incorrect float '" + pname + "': " + p)
                 cscd.ICS.append(v)
         '''
-        
+
     #Handle property parsing errors as an excpetion
     if len(errors) > 0:
         errorMsg = "There are property parsing errors:\n"
