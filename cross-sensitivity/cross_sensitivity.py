@@ -95,7 +95,8 @@ def parse_properties(props: dict) -> CSCalcData:
                 except Exception as e:
                     errors.append("Incorrect float '" + pname + "': " + p)
                 cscd.R.append(v)
-
+        
+        '''
         #Parse Individual Codes of Sensitivity
         cscd.ICS = []
         for i in range(n):
@@ -110,7 +111,8 @@ def parse_properties(props: dict) -> CSCalcData:
                 except Exception as e:
                     errors.append("Incorrect float '" + pname + "': " + p)
                 cscd.ICS.append(v)
-
+        '''
+        
     #Handle property parsing errors as an excpetion
     if len(errors) > 0:
         errorMsg = "There are property parsing errors:\n"

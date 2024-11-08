@@ -21,13 +21,6 @@ R3 = 50
 R4 = 500
 R5 = 500
 
-#Individual Code of Sensitivity
-ICS1 = 1
-ICS2 = 1
-ICS3 = 1
-ICS4 = 1
-ICS5 = 1
-
 #Temperature Coefficient of Span (interpolated as a polynomial)
 TCS1 = 0.8762, 0.0073, -7E-05
 TCS2 = 0.7897, 0.0107, -7E-05
