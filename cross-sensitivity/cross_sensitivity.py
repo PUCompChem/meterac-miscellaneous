@@ -37,19 +37,58 @@ def load_ics_values(filepath: str, cscd: CSCalcData):
     ...    
     '''
     ICSs = {}
+    errors = []
+    n = cscd.num_of_sensors
+    lineNum = 0
     with open(filepath, "rt") as f:
         for line in f:
             l = line.strip()
+            lineNum += 1
             if l != '' and not l.startswith("#"):
-                n = n+1                               
                 tokens = l.split(",")
-                if len(tokens) != 2:
+                if len(tokens) != n+1:
+                    errors.append("On line " + str(lineNum) + ": incorrect number of tokens! "+
+                                  "It must be " + str(n+1))
                     continue
                 key = tokens[0].strip()
-                #value = tokens[1].strip()
-                #if key != '' and value != '': 
-                #    props[key] = value
-    
+                if key == '':
+                    errors.append("On line " + str(lineNum) + ": first token is empty!")
+                    continue
+
+                if key == 'node':
+                    #Checking senso names
+                    for i in range(n):
+                        t = tokens[i+1].strip()
+                        if t != cscd.sensors[i]:
+                            errors.append("On line " + str(lineNum) + ": the name of sensor #"
+                                          + str (i+1) + " '" + t +
+                                          "' is not corresponding to the loaded sensor name '" + cscd.sensors[i] + "'")
+                else:
+                    #loading ics values
+                    values =[]
+                    for i in range(n):
+                        t = tokens[i+1].strip()
+                        v = None
+                        if t == '':
+                            errors.append("On line " + str(lineNum) + ": token #"
+                                          + str (i+1) + " is empty")
+                        else:
+                            try:
+                                v = float(t)
+                            except Exception as e:
+                                errors.append("On line " + str(lineNum) + ": Incorrect float token #"
+                                          + str (i+1) + " --> " + t)
+                        values.append(v)
+                    ICSs[key] = values
+
+    #Handle line reading and parsing errors as an excpetion
+    if len(errors) > 0:
+        errorMsg = "There are errors on reading and parsing ICS values from file: " + filepath + "\n"
+        for err in errors:
+            errorMsg += "  " + err + "\n"
+        raise Exception(errorMsg)
+    else:
+       cscd.ICSs = ICSs
 
 def parse_properties(props: dict) -> CSCalcData:
     cscd = CSCalcData()
