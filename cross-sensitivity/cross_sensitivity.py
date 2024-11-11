@@ -3,6 +3,8 @@ import numpy as np
 class CSCalcData:
     def __init__(self):        
         self.num_of_sensors = None
+        self.signal_scaling = None
+        self.ics_unit_scaling = None
         self.sensors = None         #list of names (designations)
         self.cs = None              #list of lists (cross sensitivity matrix)
         self.R = None               #list of float values (resistences in KOms)
@@ -104,6 +106,28 @@ def parse_properties(props: dict) -> CSCalcData:
             cscd.num_of_sensors = ns
     else:    
         errors.append("Property 'num_of_sensors' is missing")
+    
+    signal_scaling_prop = props.get("signal_scaling")
+    if (signal_scaling_prop!= None):
+        try:
+            ss = float(signal_scaling_prop)
+        except Exception as e:
+            errors.append("signal_scaling is not correct float: " + signal_scaling_prop)
+        else:
+            cscd.signal_scaling = ss
+    else:    
+        errors.append("Property 'signal_scaling' is missing")
+
+    ics_unit_scaling_prop = props.get("ics_unit_scaling")
+    if (ics_unit_scaling_prop!= None):
+        try:
+            us = float(ics_unit_scaling_prop)
+        except Exception as e:
+            errors.append("ics_unit_scaling is not correct float: " + ics_unit_scaling_prop)
+        else:
+            cscd.ics_unitl_scaling = us
+    else:    
+        errors.append("Property 'ics_unit_scaling' is missing")    
 
     n = cscd.num_of_sensors
     if (n != None):
@@ -156,24 +180,7 @@ def parse_properties(props: dict) -> CSCalcData:
                 except Exception as e:
                     errors.append("Incorrect float '" + pname + "': " + p)
                 cscd.R.append(v)
-        
-        '''
-        #Parse Individual Codes of Sensitivity
-        cscd.ICS = []
-        for i in range(n):
-            pname = "ICS" + str(i+1)
-            p = props.get(pname)
-            if (p == None):
-                errors.append("Property '" + pname + "' is missing")
-            else:
-                v = None
-                try:
-                    v = float(p)
-                except Exception as e:
-                    errors.append("Incorrect float '" + pname + "': " + p)
-                cscd.ICS.append(v)
-        '''
-
+   
     #Handle property parsing errors as an excpetion
     if len(errors) > 0:
         errorMsg = "There are property parsing errors:\n"
