@@ -1,5 +1,11 @@
 num_of_sensors = 5
 
+#this constant comes from the sensor technical specifications
+signal_scaling = 15.625
+
+#this is specific to the ICS values in nA/ppm
+ics_unit_scaling = 0.000000001
+
 #Sensors
 sensor_1 = CO
 sensor_2 = SO2
@@ -26,12 +32,12 @@ TCS1 = 0.8762, 0.0073, -7E-05
 TCS2 = 0.7897, 0.0107, -7E-05
 TCS3 = 0.9442, 0.0037, -5E-05
 TCS4 = 0.9126, 0.0031, 2E-05, -3E-07
-TCS5 = 1
+TCS5 = 0.9126, 0.0031, 2E-05, -3E-07
 
 #Zero Shift (interpolated as a polynomial)
 ZS1 = -0.0749, -0.0529, 0.0033, 0.0002
 ZS2 = 0.2359, 0.0012, 0.0025, 9E-05
 ZS3 = 0.0994, 0.0046, -8E-05, -2E-06, 6E-08
 ZS4 = -0.0006, -0.0006, -3E-06, 2E-06
-ZS5 = 0
+ZS5 = -0.0006, -0.0006, -3E-06, 2E-06
 
