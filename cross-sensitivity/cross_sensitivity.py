@@ -11,8 +11,10 @@ class CSCalcData:
         self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of nodes)
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
+        self.invAPrecalc = None     #numpy array with the inverse wotking matrix loaded from file
         self.b = None               #numpy array with voltage scaled/processed matrix
         self.C = None               #numpy array with caclualted concetrations
+        
 
         
 def load_properties(filepath: str):
@@ -163,8 +165,32 @@ def parse_properties(props: dict) -> CSCalcData:
                         except Exception as e:
                            errors.append("Incorrect float token in '" + pname + "': " + t)                        
                         values.append(v)
-
                 cscd.cs.append(values)
+
+        #Parse invA precalculated matrix (properties invA_1, invA_2,...)
+        if props.get("invA_1") != None:
+            cscd.invAPrecalc = []
+            for i in range(n):
+                pname = "invA_" + str(i+1)
+                p = props.get(pname)
+                tokens = p.split(",")
+                values = []
+                if len(tokens) != n:
+                    errors.append("Incorrect number of values in '" + pname + "': " + str(len(tokens))
+                              + ". It must be " + str(n))
+                else:
+                    for tok in tokens:
+                        t = tok.strip()
+                        v = None
+                        if t == '':
+                            errors.append("There is an empty token in '" + pname + "'")
+                        else:
+                            try:
+                                v = float(t)
+                            except Exception as e:
+                                errors.append("Incorrect float token in '" + pname + "': " + t)
+                        values.append(v)
+                    cscd.invAPrecalc.append(values)
       
         #Parse resistances
         cscd.R = []
