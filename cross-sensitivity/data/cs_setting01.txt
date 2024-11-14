@@ -20,12 +20,12 @@ cs_3 = 0.027, 0.085, 1, -0.18, -0.2
 cs_4 = 0.0001, 0, -0.5, 1, 0
 cs_5 = 0.0002, 0.005, -0.232, -0.1, 1
 
-#Resistance in KOms
-R_1 = 100
-R_2 = 100
-R_3 = 50
-R_4 = 500
-R_5 = 500
+#Resistance in Oms
+R_1 = 100000
+R_2 = 100000
+R_3 = 50000
+R_4 = 500000
+R_5 = 500000
 
 #Temperature Coefficient of Span (interpolated as a polynomial)
 TCS_1 = 0.8762, 0.0073, -7E-05
