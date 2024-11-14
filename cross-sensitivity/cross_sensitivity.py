@@ -258,15 +258,27 @@ def get_inv_work_matrix(cscd: CSCalcData):
         #the matrix is taken from file (pre-calculated)
         cscd.invA = cscd.invAPrecalc
 
-def calc_b_matrix(voltages: list[float], temp:float, cscd: CSCalcData):
-    pass
+def calc_TCS(sensor_num: int, temperature:float, cscd: CSCalcData) -> float:
+    #TODO
+    return 0
 
+def calc_ZS(sensor_num: int, temperature:float, cscd: CSCalcData) -> float:
+    #TODO
+    return 0
+
+def getc_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
+    #TODO
+    return 0
+
+def calc_b_matrix(device: str, voltages: list[float], temperature:float, cscd: CSCalcData):
+    # bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
+    pass
 
 def solve_system(cscd: CSCalcData):
     pass 
 
 
-def calc_concentrations(voltages: list[float], temp:float, cscd: CSCalcData):
+def calc_concentrations(device: str, voltages: list[float], temp:float, cscd: CSCalcData):
     pass
 
 
