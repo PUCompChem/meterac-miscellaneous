@@ -8,6 +8,8 @@ class CSCalcData:
         self.sensors = None         #list of names (designations)
         self.cs = None              #list of lists (cross sensitivity matrix)
         self.R = None               #list of float values (resistences in KOms)
+        self.TCSCoeffs = None       #list of lists Temperature Coefficient of Span (interpolated as a polynomial)
+        self.ZSCoeffs = None        #list of lists Zero Shift (interpolated as a polynomial)
         self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of nodes)
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
@@ -206,6 +208,46 @@ def parse_properties(props: dict) -> CSCalcData:
                 except Exception as e:
                     errors.append("Incorrect float '" + pname + "': " + p)
                 cscd.R.append(v)
+
+        #Parse TCS polynomial coefficients
+        cscd.TCSCoeffs = []
+        for i in range(n):
+            pname = "TCS_" + str(i+1)
+            p = props.get(pname)
+            tokens = p.split(",")
+            coeffs = []
+            for tok in tokens:
+                t = tok.strip()
+                c = None
+                if t == '':
+                    errors.append("There is an empty token in '" + pname + "'") 
+                else:    
+                    try:
+                        c = float(t) 
+                    except Exception as e:
+                           errors.append("Incorrect float token in '" + pname + "': " + t)                        
+                    coeffs.append(c)
+            cscd.TCSCoeffs.append(coeffs)
+
+        #Parse ZS polynomial coefficients
+        cscd.ZSCoeffs = []
+        for i in range(n):
+            pname = "ZS_" + str(i+1)
+            p = props.get(pname)
+            tokens = p.split(",")
+            coeffs = []
+            for tok in tokens:
+                t = tok.strip()
+                c = None
+                if t == '':
+                    errors.append("There is an empty token in '" + pname + "'") 
+                else:    
+                    try:
+                        c = float(t) 
+                    except Exception as e:
+                           errors.append("Incorrect float token in '" + pname + "': " + t)                        
+                    coeffs.append(c)
+            cscd.ZSCoeffs.append(coeffs)    
    
     #Handle property parsing errors as an excpetion
     if len(errors) > 0:
