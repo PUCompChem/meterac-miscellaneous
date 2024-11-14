@@ -10,7 +10,7 @@ class CSCalcData:
         self.R = None               #list of float values (resistences in KOms)
         self.TCSCoeffs = None       #list of lists Temperature Coefficient of Span (interpolated as a polynomial)
         self.ZSCoeffs = None        #list of lists Zero Shift (interpolated as a polynomial)
-        self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of nodes)
+        self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of devices/nodes)
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.invAPrecalc = None     #numpy array with the inverse wotking matrix loaded from file
@@ -324,9 +324,9 @@ def calc_ZS(sensor_num: int, temperature:float, cscd: CSCalcData) -> float:
     v = calc_polynomial_value (temperature, cscd.ZSCoeffs[sensor_num])
     return v
 
-def getc_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
-    #TODO
-    return 0
+def get_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
+    ics_values = cscd.ICSs.get(device)
+    return ics_values[sensor_num]
 
 def calc_b_matrix(device: str, voltages: list[float], temperature:float, cscd: CSCalcData):
     # bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
