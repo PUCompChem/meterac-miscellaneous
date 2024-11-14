@@ -258,6 +258,20 @@ def get_inv_work_matrix(cscd: CSCalcData):
         #the matrix is taken from file (pre-calculated)
         cscd.invA = cscd.invAPrecalc
 
+def calc_polynomial_value(x: float, coeffs: list[float]) -> float:
+    '''
+    coeffs are given in order:
+    from power zero to highest power n: c0, c1, ...
+    p(x) = c0 + c1*x + c2*x^2 + c3*x^3 + ...
+    '''
+    p = 0.0
+    x_power = 1.0
+    n = len(coeffs)
+    for i in range(n):
+        p += coeffs[i]*x_power
+        x_power *= x
+    return p
+
 def calc_TCS(sensor_num: int, temperature:float, cscd: CSCalcData) -> float:
     #TODO
     return 0
