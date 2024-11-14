@@ -315,12 +315,14 @@ def calc_polynomial_value(x: float, coeffs: list[float]) -> float:
     return p
 
 def calc_TCS(sensor_num: int, temperature:float, cscd: CSCalcData) -> float:
-    #TODO
-    return 0
+    #sensor_num is 0-based
+    v = calc_polynomial_value (temperature, cscd.TCSCoeffs[sensor_num])
+    return v
 
 def calc_ZS(sensor_num: int, temperature:float, cscd: CSCalcData) -> float:
-    #TODO
-    return 0
+    #sensor_num is 0-based
+    v = calc_polynomial_value (temperature, cscd.ZSCoeffs[sensor_num])
+    return v
 
 def getc_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
     #TODO
