@@ -195,7 +195,7 @@ def parse_properties(props: dict) -> CSCalcData:
         #Parse resistances
         cscd.R = []
         for i in range(n):
-            pname = "R" + str(i+1)
+            pname = "R_" + str(i+1)
             p = props.get(pname)
             if (p == None):
                 errors.append("Property '" + pname + "' is missing")
