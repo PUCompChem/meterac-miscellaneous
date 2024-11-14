@@ -249,6 +249,14 @@ def calc_inv_work_matrix(cscd: CSCalcData):
     invA = np.linalg.inv(cscd.A)
     cscd.invA = invA    
 
+def get_inv_work_matrix(cscd: CSCalcData):
+    if cscd.invAPrecalc == None:
+        #the matrix is calculated
+        calc_work_matrix(cscd)
+        calc_inv_work_matrix(cscd)
+    else:
+        #the matrix is taken from file (pre-calculated)
+        cscd.invA = cscd.invAPrecalc
 
 def calc_b_matrix(voltages: list[float], temp:float, cscd: CSCalcData):
     pass
