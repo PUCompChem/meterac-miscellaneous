@@ -326,7 +326,7 @@ def get_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
     ics_values = cscd.ICSs.get(device)
     return ics_values[sensor_num]
 
-def calc_b(device: str, voltages: list[float], temperature:float, cscd: CSCalcData) -> [float]:
+def calc_b(device: str, voltages: list[float], temperature:float, cscd: CSCalcData) -> list[float]:
     # bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
     n = len(voltages)
     b = []
