@@ -296,7 +296,9 @@ def get_inv_work_matrix(cscd: CSCalcData):
         calc_inv_work_matrix(cscd)
     else:
         #the matrix is taken from file (pre-calculated)
-        cscd.invA = cscd.invAPrecalc
+        m = np.array(cscd.invAPrecalc)
+        cscd.invA = m
+    return (cscd.invA)
 
 def calc_polynomial_value(x: float, coeffs: list[float]) -> float:
     '''
@@ -342,8 +344,12 @@ def solve_system(cscd: CSCalcData):
     pass 
 
 
-def calc_concentrations(device: str, voltages: list[float], temp:float, cscd: CSCalcData):
-    pass
+def calc_concentrations(device: str, voltages: list[float], temperature:float, cscd: CSCalcData):
+    b = calc_b(device, voltages, temperature, cscd)
+    b_matrix = np.array([b]).transpose()
+    invA = np.array(get_inv_work_matrix(cscd))
+    c = np.multiply(invA,b_matrix)
+    return c
 
 
 def outputCSResult(cscd: CSCalcData, sep: str):
