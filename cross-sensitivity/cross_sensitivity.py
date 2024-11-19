@@ -14,9 +14,7 @@ class CSCalcData:
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.invAPrecalc = None     #numpy array with the inverse wotking matrix loaded from file
-        self.b = None               #numpy array with voltage scaled/processed matrix
-        self.C = None               #numpy array with caclualted concetrations
-        
+                
 
         
 def load_properties(filepath: str):
@@ -328,9 +326,17 @@ def get_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
     ics_values = cscd.ICSs.get(device)
     return ics_values[sensor_num]
 
-def calc_b_matrix(device: str, voltages: list[float], temperature:float, cscd: CSCalcData):
+def calc_b(device: str, voltages: list[float], temperature:float, cscd: CSCalcData) -> [float]:
     # bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
-    pass
+    n = len(voltages)
+    b = []
+    for i in range(n):
+        tcs_i = calc_TCS(i, temperature, cscd)
+        ics_i = get_ICS(device, i, cscd)
+        zs_i = calc_ZS(i, temperature, cscd)
+        b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) + zs_i
+        b.append(b_i)
+    return b
 
 def solve_system(cscd: CSCalcData):
     pass 
