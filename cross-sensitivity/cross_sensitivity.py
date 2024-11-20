@@ -348,7 +348,7 @@ def calc_concentrations(device: str, voltages: list[float], temperature:float, c
     b = calc_b(device, voltages, temperature, cscd)
     b_matrix = np.array([b]).transpose()
     invA = np.array(get_inv_work_matrix(cscd))
-    c = np.multiply(invA,b_matrix)
+    c = np.matmul(invA,b_matrix)
     return c
 
 
