@@ -52,7 +52,8 @@ def extract_arguments(args: list[str], options: list[CLIOption]) -> dict[str, ob
                                 standard_options[opt.longName] = args[i]
                             else:
                                 standard_options[opt.longName] = None
-            main_arguments.append(args[i])
+            if not opt_flag:
+                main_arguments.append(args[i])
             i+=1
 
     arg_dict["main_arguments"] = main_arguments
