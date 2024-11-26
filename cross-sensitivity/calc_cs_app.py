@@ -6,10 +6,10 @@ import sys
 from cross_sensitivity import *
 
 class CLIOption:
-    def __init__(self, shortName: str, longName: str, booleanOpt : bool):
+    def __init__(self, shortName: str, longName: str, requiresArgument : bool):
         self.shortName = shortName
         self.longName = longName
-        self.booleanOpt = booleanOpt
+        self.requiresArgument = requiresArgument
 
     def checkOption(self, arg: str) -> bool:
        #Checking whether the argument is an CLI option:
@@ -44,7 +44,7 @@ def extract_arguments(args: list[str], options: list[CLIOption]) -> dict[str, ob
                 for opt in options:
                     if opt.checkOption(args[i]):
                         opt_flag = True
-                        if opt.booleanOpt:
+                        if not opt.requiresArgument:
                             boolean_options.append(opt.longName)
                         else:
                             i+=1 #iterated to next argument to get option value
@@ -61,7 +61,7 @@ def extract_arguments(args: list[str], options: list[CLIOption]) -> dict[str, ob
     arg_dict["standard_options"] = standard_options
     return arg_dict
 
-options = [CLIOption("f","file", False)]
+options = [CLIOption("f","file", True)]
 
 arguments = extract_arguments(sys.argv, options)
 print(arguments)
