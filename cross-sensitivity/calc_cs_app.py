@@ -61,7 +61,10 @@ def extract_arguments(args: list[str], options: list[CLIOption]) -> dict[str, ob
     arg_dict["standard_options"] = standard_options
     return arg_dict
 
-options = [CLIOption("f","file", True)]
+options = [CLIOption("-i","ics-data", True), CLIOption("-c","cs-settings", True)]
+ics_data_file = "./data/ics_data01.txt"
+cs_setting_file = "./data/cs_settings01.txt"
+
 
 arguments = extract_arguments(sys.argv, options)
 print(arguments)
