@@ -38,7 +38,7 @@ def extract_arguments(args: list[str], options: list[CLIOption]) -> dict[str, ob
     if n > 1:
         i = 1
         while i < n:
-            print(args[i])
+            #print(args[i])
             opt_flag = False
             if options:
                 for opt in options:
@@ -61,10 +61,64 @@ def extract_arguments(args: list[str], options: list[CLIOption]) -> dict[str, ob
     arg_dict["standard_options"] = standard_options
     return arg_dict
 
-options = [CLIOption("-i","ics-data", True), CLIOption("-c","cs-settings", True)]
+def parse_float(arg: str) -> float:
+    v = None
+    try:
+        v = float(arg)
+    except Exception as e:
+        print("Incorrect float argument: " + arg)
+    return v
+
+
+#Setting CLI options and default file names
+options = [CLIOption("-i","ics-data", True), 
+           CLIOption("-c","cs-settings", True),
+           CLIOption("-u","uncorrected", False)]
 ics_data_file = "./data/ics_data01.txt"
 cs_setting_file = "./data/cs_settings01.txt"
 
-
+#Handle CLI input arguments
+#Example worflow:
+#Input: ID T CO SO2  H2S O3 NO2 ------> AQI CALCULATOR ------> Output: CO SO2 H2S  O3 NO2
+num_of_errors = 0
 arguments = extract_arguments(sys.argv, options)
-print(arguments)
+
+#Load basic settings for calculation
+props = load_properties(cs_setting_file)
+cscd = parse_properties(props)
+load_ics_values(ics_data_file, cscd)
+n = cscd.num_of_sensors
+id = None
+voltages = []
+T = None
+
+#Parse arguments
+main_arguments = arguments["main_arguments"]
+if len(main_arguments) != n+2:
+    print("Incorrect number of input arguments!")
+    num_of_errors += 1
+else:
+    id = main_arguments[0]
+    T = parse_float(main_arguments[1])
+    for i in range(n):
+        v = parse_float(main_arguments[2+i])
+        if v == None:
+            num_of_errors+=1
+        voltages.append(v)
+
+#Check id
+if id != None:
+    if id not in cscd.ICSs.keys():
+        num_of_errors += 1
+        print("Incorrect device id!")
+        print("Availabe devices:")
+        print("  " + str(list(cscd.ICSs.keys())))
+
+#Perform calculations
+if num_of_errors == 0:
+    C = calc_concentrations(id,voltages, T,  cscd)
+    print(C)
+else:
+    print("No calculation is performed. Found " + str(num_of_errors) + " error/s!")
+
+
