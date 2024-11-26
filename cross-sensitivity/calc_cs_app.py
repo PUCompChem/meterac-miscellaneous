@@ -5,6 +5,8 @@ A simple console app for calculation of cross sensitivity
 import sys
 from cross_sensitivity import *
 
+errors_out = []
+
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool):
         self.shortName = shortName
@@ -66,14 +68,15 @@ def parse_float(arg: str) -> float:
     try:
         v = float(arg)
     except Exception as e:
-        print("Incorrect float argument: " + arg)
+        errors_out.append("Incorrect float argument: " + arg)
     return v
 
 
 #Setting CLI options and default file names
 options = [CLIOption("-i","ics-data", True), 
            CLIOption("-c","cs-settings", True),
-           CLIOption("-u","uncorrected", False)]
+           CLIOption("-u","uncorrected", False),
+           CLIOption("-v","verbose", False)]
 ics_data_file = "./data/ics_data01.txt"
 cs_setting_file = "./data/cs_settings01.txt"
 
@@ -95,7 +98,8 @@ T = None
 #Parse arguments
 main_arguments = arguments["main_arguments"]
 if len(main_arguments) != n+2:
-    print("Incorrect number of input arguments!")
+    errors_out.append("Incorrect number of input arguments!")
+    errors_out.append("Expected input arguments: ID T V1 V2 ...")
     num_of_errors += 1
 else:
     id = main_arguments[0]
@@ -110,15 +114,22 @@ else:
 if id != None:
     if id not in cscd.ICSs.keys():
         num_of_errors += 1
-        print("Incorrect device id!")
-        print("Availabe devices:")
-        print("  " + str(list(cscd.ICSs.keys())))
+        errors_out.append("Incorrect device id!")
+        errors_out.append("Availabe devices:")
+        errors_out.append("  " + str(list(cscd.ICSs.keys())))
 
 #Perform calculations
 if num_of_errors == 0:
     C = calc_concentrations(id,voltages, T,  cscd)
-    print(C)
+    output_s = "0  "  #OK flag (no errors)
+    for i in range(n):
+        output_s += str(C[i,0]) + " "
+    print(output_s)
+        
 else:
-    print("No calculation is performed. Found " + str(num_of_errors) + " error/s!")
+    print(str(num_of_errors) +
+        "  No calculation is performed. Found " + str(num_of_errors) + " error/s!")
+    for err_line in errors_out:
+        print(err_line)
 
 
