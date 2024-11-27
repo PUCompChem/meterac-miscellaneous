@@ -14,19 +14,20 @@ class CLIOption:
         self.requiresArgument = requiresArgument
 
     def checkOption(self, arg: str) -> bool:
-       #Checking whether the argument is an CLI option:
-       # -o  or --option (returns true)
-       if arg.startswith("--"):
-           #checking long names
-           opt = arg[2:]
-           if (opt == self.longName):
-               return True
-       elif arg.startswith("-"):
-           #checking short names
-           opt = arg[1:]
-           if (opt == self.shortName):
-               return True
-       return False
+        #Checking whether the argument is an CLI option:
+        # -o  or --option (returns true)
+        print(arg)
+        if arg.startswith("--"):
+            #checking long names
+            opt = arg[2:]
+            if (opt == self.longName):
+                return True
+        elif arg.startswith("-"):
+            #checking short names
+            opt = arg[1:]
+            if (opt == self.shortName):
+                return True
+        return False
 
 
 def extract_arguments(args: list[str], options: list[CLIOption]) -> dict[str, object]:
@@ -73,18 +74,21 @@ def parse_float(arg: str) -> float:
 
 
 #Setting CLI options and default file names
-options = [CLIOption("-i","ics-data", True), 
-           CLIOption("-c","cs-settings", True),
-           CLIOption("-u","uncorrected", False),
-           CLIOption("-v","verbose", False)]
+options = [CLIOption("i","ics-data", True), 
+           CLIOption("c","cs-settings", True),
+           CLIOption("u","uncorrected", False),
+           CLIOption("v","verbose", False)]
 ics_data_file = "./data/ics_data01.txt"
 cs_setting_file = "./data/cs_settings01.txt"
 
 #Handle CLI input arguments
+# ID T V1 V2 ... -i ics-file -c cs-file -u -v
 #Example worflow:
 #Input: ID T CO SO2  H2S O3 NO2 ------> AQI CALCULATOR ------> Output: CO SO2 H2S  O3 NO2
 num_of_errors = 0
 arguments = extract_arguments(sys.argv, options)
+flag_uncorrected = "uncorrected" in arguments["boolean_options"]
+flag_verbose = "verbose" in arguments["boolean_options"]
 
 #Load basic settings for calculation
 props = load_properties(cs_setting_file)
