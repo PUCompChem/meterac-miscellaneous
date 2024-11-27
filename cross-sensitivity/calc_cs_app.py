@@ -15,8 +15,7 @@ class CLIOption:
 
     def checkOption(self, arg: str) -> bool:
         #Checking whether the argument is an CLI option:
-        # -o  or --option (returns true)
-        print(arg)
+        # -o  or --option (returns true)        
         if arg.startswith("--"):
             #checking long names
             opt = arg[2:]
@@ -124,14 +123,21 @@ if id != None:
 
 #Perform calculations
 if num_of_errors == 0:
-    C = calc_concentrations(id,voltages, T,  cscd)
-    output_s = "0  "  #OK flag (no errors)
-    for i in range(n):
-        output_s += str(C[i,0]) + " "
-    print(output_s)
-        
+    if flag_uncorrected:
+        #print("Calculating non corrected concetrations:")
+        b = calc_b(id,voltages, T,  cscd)
+        output_s = "0  "
+        for i in range(n):
+            output_s += str(b[i]) + " "
+        print(output_s)
+    else:
+        C = calc_concentrations(id,voltages, T,  cscd)
+        output_s = "0  "  #First output token is the OK flag (no errors)
+        for i in range(n):
+            output_s += str(C[i,0]) + " "
+        print(output_s)
 else:
-    print(str(num_of_errors) +
+    print(str(num_of_errors) + #First output token a aproblem flag (number of errors)
         "  No calculation is performed. Found " + str(num_of_errors) + " error/s!")
     for err_line in errors_out:
         print(err_line)
