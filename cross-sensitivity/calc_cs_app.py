@@ -86,12 +86,14 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("c","cs-settings", True),
            CLIOption("u","uncorrected", False),
            CLIOption("v","verbose", False),
+           CLIOption("n","negative-correction", True),
            CLIOption("h","help", False)]
 ics_data_file = "./data/ics_data01.txt"        #default value
 cs_setting_file = "./data/cs_settings01.txt"   #default value
+flag_negative_correction = True                #default value
 
 #Handle CLI input arguments
-# ID T V1 V2 ... -i <ics-file> -c <cs-file> -u -v
+# ID T V1 V2 ...Vn -i <ics-file> -c <cs-file> -u -v
 num_of_errors = 0
 arguments = extract_arguments(sys.argv, options)
 flag_help = "help" in arguments["boolean_options"]
@@ -119,7 +121,29 @@ if "cs-settings" in arguments["standard_options"].keys():
         errors_out.append("Option -c (--cs-settings) has no argument!")
         num_of_errors += 1
 
+#Get negative-correction option
+if "negative-correction" in arguments["standard_options"].keys():
+    neg_corr = arguments["standard_options"]["negative-correction"]
+    if neg_corr != None:
+        if neg_corr.lower() == "on" or neg_corr.lower() == "true":
+            flag_negative_correction = True
+        elif neg_corr.lower() == "off" or neg_corr.lower() == "false":
+            flag_negative_correction = False
+        else:
+            errors_out.append("Incorrect argument for Option -n (--negative-correction): " + neg_corr)
+            num_of_errors += 1
+    else:
+        errors_out.append("Option -n (--negative-correction) has no argument!")
+        num_of_errors += 1
+
+if flag_verbose:
+    print("ics data is loaded from file: " + ics_data_file)
+    print("cs settings are loaded from file: " + cs_setting_file)
+    print("Negative value correction = " + str(flag_negative_correction))
+
 #Load basic settings for calculation
+if flag_verbose:
+    print("Loading and parsing cs settings...")
 props = load_properties(cs_setting_file)
 cscd = parse_properties(props)
 load_ics_values(ics_data_file, cscd)
@@ -129,10 +153,13 @@ voltages = []
 T = None
 
 #Parse arguments
+if flag_verbose:
+    print("Parsing arguments...")
 main_arguments = arguments["main_arguments"]
 if len(main_arguments) != n+2:
     errors_out.append("Incorrect number of input arguments!")
-    errors_out.append("Expected input arguments: ID T V1 V2 ...")
+    errors_out.append("Expected input arguments: ID T V1 V2 ... Vn")
+    errors_out.append("Expecting device ID, Temperature and " + str(n) + " float values!")
     num_of_errors += 1
 else:
     id = main_arguments[0]
@@ -147,13 +174,15 @@ else:
 if id != None:
     if id not in cscd.ICSs.keys():
         num_of_errors += 1
-        errors_out.append("Incorrect device id!")
+        errors_out.append("Incorrect device ID!")
         errors_out.append("Availabe devices:")
         errors_out.append("  " + str(list(cscd.ICSs.keys())))
 
 #Perform calculations
 #Example worflow:
 #Input: ID T CO SO2  H2S O3 NO2 ------> AQI CALCULATOR ------> Output: CO SO2 H2S  O3 NO2
+if flag_verbose:
+    print("Calculation result:")
 if num_of_errors == 0:
     if flag_uncorrected:
         #print("Calculating non corrected concetrations:")
