@@ -193,6 +193,8 @@ if num_of_errors == 0:
         print(output_s)
     else:
         C = calc_concentrations(id,voltages, T,  cscd)
+        if flag_negative_correction:
+            correct_negative_values(C)
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):
             output_s += str(C[i,0]) + " "

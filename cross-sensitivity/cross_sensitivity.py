@@ -14,9 +14,9 @@ class CSCalcData:
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.invAPrecalc = None     #numpy array with the inverse wotking matrix loaded from file
-                
 
-        
+
+
 def load_properties(filepath: str):
     props = {}
     with open(filepath, "rt") as f:
@@ -340,10 +340,6 @@ def calc_b(device: str, voltages: list[float], temperature:float, cscd: CSCalcDa
         b.append(b_i)
     return b
 
-def solve_system(cscd: CSCalcData):
-    pass 
-
-
 def calc_concentrations(device: str, voltages: list[float], temperature:float, cscd: CSCalcData):
     b = calc_b(device, voltages, temperature, cscd)
     b_matrix = np.array([b]).transpose()
@@ -370,4 +366,13 @@ def printMatrix(M:np.array, sep:str):
             if j < n-1:
                 line +=(sep)
         print(line)
-    
+
+def correct_negative_values(M:np.array):
+    nRows = len(M)
+    for i in range(nRows):
+        m = len(M[i])
+        for j in range(m):
+            if M[i][j] < 0:
+                M[i][j] = 0
+
+
