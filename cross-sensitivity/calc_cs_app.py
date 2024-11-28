@@ -107,7 +107,7 @@ flag_verbose = "verbose" in arguments["boolean_options"]
 if "ics-data" in arguments["standard_options"].keys():
     fname = arguments["standard_options"]["ics-data"]
     if fname != None:
-        cs_setting_file = fname
+        ics_data_file = fname
     else:
         errors_out.append("Option -i (--ics-data) has no argument!")
         num_of_errors += 1
@@ -116,7 +116,7 @@ if "ics-data" in arguments["standard_options"].keys():
 if "cs-settings" in arguments["standard_options"].keys():
     fname = arguments["standard_options"]["cs-settings"]
     if fname != None:
-        ics_data_file = fname
+        cs_setting_file = fname
     else:
         errors_out.append("Option -c (--cs-settings) has no argument!")
         num_of_errors += 1

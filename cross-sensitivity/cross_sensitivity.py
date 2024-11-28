@@ -223,7 +223,7 @@ def parse_properties(props: dict) -> CSCalcData:
                     try:
                         c = float(t) 
                     except Exception as e:
-                           errors.append("Incorrect float token in '" + pname + "': " + t)                        
+                        errors.append("Incorrect float token in '" + pname + "': " + t)                        
                     coeffs.append(c)
             cscd.TCSCoeffs.append(coeffs)
 
