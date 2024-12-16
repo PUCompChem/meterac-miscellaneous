@@ -34,12 +34,26 @@ TCS_3 = 0.9442, 0.0037, -5E-05
 TCS_4 = 0.9126, 0.0031, 2E-05, -3E-07
 TCS_5 = 0.9126, 0.0031, 2E-05, -3E-07
 
+#Temperature Coefficient of Span Data Points (T_i, TCS_i) to be used for linear interpolation
+TCS_1_DPs = -30, 0.6, -16, 0.73, -5, 0.85, 8, 0.93, 22, 1, 36, 1.06, 52, 1.08
+TCS_2_DPs = -30, 0.42, -16, 0.57, -5, 0.75, 8, 0.85, 22, 1, 36, 1.1, 52, 1.13
+TCS_3_DPs =
+TCS_4_DPs =
+TCS_5_DPs =
+
 #Zero Shift (interpolated as a polynomial)
 ZS_1 = -0.0749, -0.0529, 0.0033, 0.0002
 ZS_2 = 0.2359, 0.0012, 0.0025, 9E-05
 ZS_3 = 0.0994, 0.0046, -8E-05, -2E-06, 6E-08
 ZS_4 = -0.0006, -0.0006, -3E-06, 2E-06
 ZS_5 = -0.0006, -0.0006, -3E-06, 2E-06
+
+#Zero Shift Data Points (T_i, ZS_i) to be used for linear interpolation
+ZS_1_DPs = -30, 0, -16, 1, -4, 0, 8, 0, 22, 2, 36, 10
+ZS_2_DPs = -30, 0, -16, 0.5, -5, 0, 8, 1, 22, 2, 36, 8, 52, 20 
+ZS_3_DPs =
+ZS_4_DPs =
+ZS_5_DPs =
 
 #Inverse working matrix
 invA_1 = 1.0139882028395224, 0.08964295848053214, 0.45683100197856996, 0.1774741494013618, 0.022582634075512757
