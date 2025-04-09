@@ -1,6 +1,7 @@
-#import os
-
-frequencies = None
+class AaroniaData:
+    def __init__(self):        
+        self.frequencies = []
+        self.data_matrix = []
 
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
@@ -13,11 +14,12 @@ def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     return values
 
 
-def extract_matrix_from_aaronia_file(fileName: str) -> list:
+def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
+    adata = AaroniaData()
     flag_frequencies = False
     sweepStart = None
     sweepStop = None
-    matrix = []
+    
     with open(fileName, mode ='r') as file:
         n = 0
         for line in file:
@@ -40,30 +42,27 @@ def extract_matrix_from_aaronia_file(fileName: str) -> list:
                 continue    
             else:
                 values = float_values_from_string(line)
-                #print(values)
                 if flag_frequencies:
-                    global frequencies
-                    frequencies = values
+                    adata.frequencies = values
                 else:
-                    matrix.append([sweepStart, sweepStop] + values)
+                    adata.data_matrix.append([sweepStart, sweepStop] + values)
                 #Reset work variables
                 flag_frequencies = False
                 sweepStart = None
                 sweepStop = None           
-
-    return matrix
+    return adata
 
 def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
-    matrix = extract_matrix_from_aaronia_file(aaroniaFileName)
+    adata = extract_data_from_aaronia_file(aaroniaFileName)
     file = open(csvFileName, "wt")
     # Write header line
     file.write("SweepStart,SweepStop")
-    for x in frequencies:
+    for x in adata.frequencies:
         file.write(",")
         file.write(str(x))    
     file.write("\n")    #os.linesep
     #Write matrix rows
-    for row in matrix:
+    for row in adata.data_matrix:
         n = len(row)
         for i in range(n):
             file.write(str(row[i]))
