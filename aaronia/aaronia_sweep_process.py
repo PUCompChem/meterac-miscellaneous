@@ -1,3 +1,4 @@
+#import os
 
 frequencies = None
 
@@ -36,14 +37,38 @@ def extract_matrix_from_aaronia_file(fileName: str) -> list:
                 if (line.startswith("# SweepStop=")):
                     sweepStop = line.strip()[12:]
                     continue
-
+                continue    
             else:
                 values = float_values_from_string(line)
                 #print(values)
-                matrix.append([sweepStart, sweepStop] + values)
+                if flag_frequencies:
+                    global frequencies
+                    frequencies = values
+                else:
+                    matrix.append([sweepStart, sweepStop] + values)
                 #Reset work variables
                 flag_frequencies = False
                 sweepStart = None
                 sweepStop = None           
 
     return matrix
+
+def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
+    matrix = extract_matrix_from_aaronia_file(aaroniaFileName)
+    file = open(csvFileName, "wt")
+    # Write header line
+    file.write("SweepStart,SweepStop")
+    for x in frequencies:
+        file.write(",")
+        file.write(str(x))    
+    file.write("\n")    #os.linesep
+    #Write matrix rows
+    for row in matrix:
+        n = len(row)
+        for i in range(n):
+            file.write(str(row[i]))
+            if i < n-1:
+                file.write(",")
+        file.write("\n")
+    file.close()
+    
