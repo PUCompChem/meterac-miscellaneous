@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 class AaroniaData:
     def __init__(self):        
         self.frequencies = []
@@ -75,4 +77,7 @@ def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
             file.write("," + str(x))            
         file.write("\n")
     file.close()
+
+def get_heatmap_plot(adata: AaroniaData):
     
+    pass
