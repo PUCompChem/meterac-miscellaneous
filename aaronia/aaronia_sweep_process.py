@@ -2,6 +2,8 @@ class AaroniaData:
     def __init__(self):        
         self.frequencies = []
         self.data_matrix = []
+        self.sweep_start = []
+        self.sweep_stop = []
 
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
@@ -45,7 +47,10 @@ def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
                 if flag_frequencies:
                     adata.frequencies = values
                 else:
-                    adata.data_matrix.append([sweepStart, sweepStop] + values)
+                    #adata.data_matrix.append([sweepStart, sweepStop] + values)
+                    adata.data_matrix.append(values)
+                    adata.sweep_start.append(sweepStart)
+                    adata.sweep_stop.append(sweepStop)
                 #Reset work variables
                 flag_frequencies = False
                 sweepStart = None
@@ -62,12 +67,12 @@ def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
         file.write(str(x))    
     file.write("\n")    #os.linesep
     #Write matrix rows
-    for row in adata.data_matrix:
-        n = len(row)
-        for i in range(n):
-            file.write(str(row[i]))
-            if i < n-1:
-                file.write(",")
+    n_rows = len(adata.data_matrix)
+    for k in range(n_rows):
+        row = adata.data_matrix[k]
+        file.write(adata.sweep_start[k] + "," + adata.sweep_stop[k])        
+        for x in row:
+            file.write("," + str(x))            
         file.write("\n")
     file.close()
     
