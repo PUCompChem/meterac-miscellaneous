@@ -115,6 +115,7 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plottype = "pcolormesh
     if plottype == "imshow":
         Z = np.array(adata.data_matrix, dtype='float32')
         im = plt.imshow(Z, cmap='YlGnBu', aspect='auto')
+        fig.colorbar(im, ax = ax, extend='both')
 
     if fileName == None:    
         plt.show()
