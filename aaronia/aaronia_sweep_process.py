@@ -79,12 +79,16 @@ def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
         file.write("\n")
     file.close()
 
-def get_heatmap_plot(adata: AaroniaData):
-    fig, ax = plt.subplots() 
-    X = np.array(adata.frequencies, dtype='float32')   
-    Y = np.array(adata.sweep_stop, dtype='str')
-    Z = np.array(adata.data_matrix, dtype='float32')
-    pc = ax.pcolormesh(X, Y, Z, vmin=-70, vmax=-40, cmap='RdBu_r')
-    #fig.colorbar(pc, ax)
-    ax.set_title('pcolormesh()')
-    plt.show()
+def get_heatmap_plot(adata: AaroniaData, fileName = None, plottype = "pcolormesh"):
+    fig, ax = plt.subplots()
+    if plottype == "pcolormesh": 
+        X = np.array(adata.frequencies, dtype='float32')   
+        Y = np.array(adata.sweep_stop, dtype='str')
+        Z = np.array(adata.data_matrix, dtype='float32')
+        pc = ax.pcolormesh(X, Y, Z, vmin=-70, vmax=-40, cmap='RdBu_r')
+        #fig.colorbar(pc, ax)
+        ax.set_title('pcolormesh()')
+    if fileName == None:    
+        plt.show()
+    else:
+        plt.savefig(fileName)           
