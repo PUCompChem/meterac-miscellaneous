@@ -11,15 +11,21 @@ class AaroniaData:
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
         max_len = len(self.data_matrix[0])
-        for i in range(len(self.data_matrix)):
-            if (min_len > len(self.data_matrix[i])):
-                min_len > len(self.data_matrix[i])
-            if (max_len < len(self.data_matrix[i])):
-                max_len > len(self.data_matrix[i]) 
+        min_row = 1 #1-based indexed
+        max_row = 1 #1-based indexed
+        for i in range(len(self.data_matrix)):            
+            n =  len(self.data_matrix[i]) 
+            #print((i+1), " --> ", n)
+            if min_len > n:
+                min_len = n
+                min_row = i+1
+            if max_len < n:
+                max_len = n
+                max_row = i+1
         print("frequencies len: ", len(self.frequencies))
         print("data_matrix len: ", len(self.data_matrix))
-        print("data_matrix min row len: ", min_len)
-        print("data_matrix max row len: ", max_len)
+        print("data_matrix min row len: ", min_len, " at row: ", min_row)
+        print("data_matrix max row len: ", max_len, " at row: ", max_row)
         print("sweep_start len: ", len(self.sweep_start))
         print("sweep_stop len: ", len(self.sweep_stop))
 
@@ -97,6 +103,7 @@ def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
 
 def get_heatmap_plot(adata: AaroniaData, fileName = None, plottype = "pcolormesh"):
     fig, ax = plt.subplots()
+
     if plottype == "pcolormesh": 
         X = np.array(adata.frequencies, dtype='float32')   
         Y = np.array(adata.sweep_stop, dtype='str')
@@ -104,6 +111,11 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plottype = "pcolormesh
         pc = ax.pcolormesh(X, Y, Z, vmin=-70, vmax=-40, cmap='RdBu_r')
         #fig.colorbar(pc, ax)
         ax.set_title('pcolormesh()')
+
+    if plottype == "imshow":
+        Z = np.array(adata.data_matrix, dtype='float32')
+        im = plt.imshow(Z, cmap='YlGnBu', aspect='auto')
+
     if fileName == None:    
         plt.show()
     else:
