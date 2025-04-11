@@ -8,6 +8,22 @@ class AaroniaData:
         self.sweep_start = []
         self.sweep_stop = []
 
+    def check_matrix_dimensions(self):
+        min_len = len(self.data_matrix[0])
+        max_len = len(self.data_matrix[0])
+        for i in range(len(self.data_matrix)):
+            if (min_len > len(self.data_matrix[i])):
+                min_len > len(self.data_matrix[i])
+            if (max_len < len(self.data_matrix[i])):
+                max_len > len(self.data_matrix[i]) 
+        print("frequencies len: ", len(self.frequencies))
+        print("data_matrix len: ", len(self.data_matrix))
+        print("data_matrix min row len: ", min_len)
+        print("data_matrix max row len: ", max_len)
+        print("sweep_start len: ", len(self.sweep_start))
+        print("sweep_stop len: ", len(self.sweep_stop))
+
+        
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     tokens = s.split(splitter)
