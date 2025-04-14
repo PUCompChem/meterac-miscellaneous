@@ -29,7 +29,12 @@ class AaroniaData:
         print("sweep_start len: ", len(self.sweep_start))
         print("sweep_stop len: ", len(self.sweep_stop))
 
-        
+class PlotConfig:
+    def __init__(self): 
+        self.plottype = "imshow"
+        self.x_ticks_num = 10
+        self.y_ticks_num = 10
+
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     tokens = s.split(splitter)
@@ -101,10 +106,13 @@ def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
         file.write("\n")
     file.close()
 
-def get_heatmap_plot(adata: AaroniaData, fileName = None, plottype = "pcolormesh"):
+def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig = None):
     fig, ax = plt.subplots()
+    pconf = plotConfig
+    if pconf == None:
+        pconf = PlotConfig()
 
-    if plottype == "pcolormesh": 
+    if pconf.plottype == "pcolormesh": 
         X = np.array(adata.frequencies, dtype='float32')   
         Y = np.array(adata.sweep_stop, dtype='str')
         Z = np.array(adata.data_matrix, dtype='float32')
@@ -112,9 +120,10 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plottype = "pcolormesh
         #fig.colorbar(pc, ax)
         ax.set_title('pcolormesh()')
 
-    if plottype == "imshow":
+    if pconf.plottype == "imshow":
         Z = np.array(adata.data_matrix, dtype='float32')
         im = plt.imshow(Z, cmap='YlGnBu', aspect='auto')
+        ax.set_xticks(np.arange(0, 3001, 1000), ['tick1', 'tick2', 'tick3', 'tick4'])
         fig.colorbar(im, ax = ax, extend='both')
 
     if fileName == None:    
