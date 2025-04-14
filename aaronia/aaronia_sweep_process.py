@@ -7,7 +7,9 @@ class AaroniaData:
         self.data_matrix = []
         self.sweep_start = []
         self.sweep_stop = []
-
+        self.frequency_unit = "MHz"
+        self.frequency_factor = 1.0e-6
+    
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
         max_len = len(self.data_matrix[0])
@@ -29,12 +31,33 @@ class AaroniaData:
         print("sweep_start len: ", len(self.sweep_start))
         print("sweep_stop len: ", len(self.sweep_stop))
 
+    def get_x_ticks_with_step(self, xIndexStep: int) -> list[int]:
+        return range(0,len(self.frequencies), xIndexStep)
+
+    def get_x_ticks_labels(self, x_indices: list[int]) -> list[str]:
+        labels = []
+        for i in x_indices:
+            labels.append(str(self.frequencies[i]*self.frequency_factor) 
+                          + " " + self.frequency_unit)
+        return labels
+    
+    def get_y_ticks_with_step(self, yIndexStep: int) -> list[int]:
+        return range(0, len(self.sweep_stop), yIndexStep)
+    
+    def get_y_ticks_labels(self, y_indices: list[int]) -> list[str]:
+        labels = []
+        for i in y_indices:
+            labels.append(str(self.sweep_stop[i]))
+        return labels
+
 class PlotConfig:
     def __init__(self): 
         self.plottype = "imshow"
-        self.x_ticks_num = 10
-        self.y_ticks_num = 10
-
+        self.x_ticks_num = None
+        self.y_ticks_num = 5
+        self.x_ticks_index_step = 1000
+        self.y_ticks_index_step = 100
+    
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     tokens = s.split(splitter)
@@ -110,6 +133,7 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
     fig, ax = plt.subplots()
     pconf = plotConfig
     if pconf == None:
+        #using default configuration
         pconf = PlotConfig()
 
     if pconf.plottype == "pcolormesh": 
@@ -123,7 +147,10 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
     if pconf.plottype == "imshow":
         Z = np.array(adata.data_matrix, dtype='float32')
         im = plt.imshow(Z, cmap='YlGnBu', aspect='auto')
-        ax.set_xticks(np.arange(0, 3001, 1000), ['tick1', 'tick2', 'tick3', 'tick4'])
+        xticks = adata.get_x_ticks_with_step(pconf.x_ticks_index_step)
+        ax.set_xticks(xticks, adata.get_x_ticks_labels(xticks))
+        yticks = adata.get_y_ticks_with_step(pconf.y_ticks_index_step)
+        ax.set_yticks(yticks, adata.get_y_ticks_labels(yticks))
         fig.colorbar(im, ax = ax, extend='both')
 
     if fileName == None:    
