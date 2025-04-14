@@ -53,6 +53,9 @@ class AaroniaData:
 class PlotConfig:
     def __init__(self): 
         self.plottype = "imshow"
+        self.file_dpi = 150
+        self.figure_width = 10 #inches
+        self.figure_height = 6 #inches
         self.x_ticks_num = None
         self.y_ticks_num = 5
         self.x_ticks_index_step = 1000
@@ -130,12 +133,16 @@ def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
     file.close()
 
 def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig = None):
-    fig, ax = plt.subplots()
     pconf = plotConfig
-    if pconf == None:
-        #using default configuration
-        pconf = PlotConfig()
-
+    if pconf == None:        
+        pconf = PlotConfig()  #using default configuration
+    
+    fig, ax = [None, None]
+    if fileName == None:
+        fig, ax = plt.subplots()
+    else:
+         fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height), dpi = pconf.file_dpi)   
+    
     if pconf.plottype == "pcolormesh": 
         X = np.array(adata.frequencies, dtype='float32')   
         Y = np.array(adata.sweep_stop, dtype='str')
@@ -152,7 +159,8 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
         yticks = adata.get_y_ticks_with_step(pconf.y_ticks_index_step)
         ax.set_yticks(yticks, adata.get_y_ticks_labels(yticks))
         fig.colorbar(im, ax = ax, extend='both')
-
+    
+    
     if fileName == None:    
         plt.show()
     else:
