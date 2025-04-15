@@ -56,10 +56,12 @@ class PlotConfig:
         self.file_dpi = 150
         self.figure_width = 10 #inches
         self.figure_height = 6 #inches
+        self.file_padding = 0.05 # default plot marging is very tight
         self.x_ticks_num = None
         self.y_ticks_num = 5
         self.x_ticks_index_step = 1000
         self.y_ticks_index_step = 100
+        self.hide_x_ticks = False
     
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
@@ -154,14 +156,18 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
     if pconf.plottype == "imshow":
         Z = np.array(adata.data_matrix, dtype='float32')
         im = plt.imshow(Z, cmap='YlGnBu', aspect='auto')
-        xticks = adata.get_x_ticks_with_step(pconf.x_ticks_index_step)
-        ax.set_xticks(xticks, adata.get_x_ticks_labels(xticks))
+        if pconf.hide_x_ticks:
+            ax.set_xticks([])
+            ax.spines['bottom'].set_visible(False)
+            #ax.axes.get_xaxis().set_visible(False)               
+        else:    
+            xticks = adata.get_x_ticks_with_step(pconf.x_ticks_index_step)
+            ax.set_xticks(xticks, adata.get_x_ticks_labels(xticks))
         yticks = adata.get_y_ticks_with_step(pconf.y_ticks_index_step)
         ax.set_yticks(yticks, adata.get_y_ticks_labels(yticks))
         fig.colorbar(im, ax = ax, extend='both')
-    
-    
+        
     if fileName == None:    
-        plt.show()
+        plt.show() #showing the plot in a GUI window
     else:
-        plt.savefig(fileName)           
+        plt.savefig(fileName, bbox_inches='tight', pad_inches=pconf.file_padding)
