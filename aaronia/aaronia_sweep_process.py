@@ -84,6 +84,11 @@ def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
 
 def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
     adata = AaroniaData()
+    #initial data matrices    
+    data_matrix0 = [] 
+    sweep_start0 = []
+    sweep_stop0 = []
+    #work variables and flags
     flag_frequencies = False
     val_SweepFrequencies = -1
     val_SweepPoints = -1
@@ -101,12 +106,7 @@ def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
             #print(n,line)
             if (line.startswith("#")):
                 if (line.startswith("# SweepFrequencies=")):
-                    val_SweepFrequencies = int(line.strip()[19:])
-                    if adata.frequencies != None:
-                        if val_SweepFrequencies != len(adata.frequencies):
-                            adata.errors.append("On line " + str(n) + " " + line
-                                    + "  number frequencies is different than the first sweep: "
-                                    + str(len(adata.frequencies)))
+                    val_SweepFrequencies = int(line.strip()[19:])                    
                     flag_frequencies = True
                     continue 
                 if (line.startswith("# SweepStart=")):
@@ -126,10 +126,14 @@ def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
                         #adding the frequencies from first occurence of line: # SweepFrequencies=
                         adata.frequencies = values
                     else:
-                        if val_SweepFrequencies != len(values):
+                        if val_SweepFrequencies != len(adata.frequencies):
                             adata.errors.append("On line " + str(n) 
-                                                + "  number of ellements is different than section: # SweepFrequencies=" 
+                                                + "  number of frequencies in previous sweep " + str(len(adata.frequencies))
+                                                +" is different than current section: # SweepFrequencies=" 
                                                 + str(val_SweepFrequencies))
+                            if val_SweepFrequencies >= len(adata.frequencies):
+                                #adding larger set of frequencies from from occurence of line: # SweepFrequencies=
+                                adata.frequencies = values
                 else:
                     flag_ok = True
                     if val_SweepPoints == -1:
@@ -140,25 +144,31 @@ def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
                         flag_ok = False
                         adata.errors.append("On line " + str(n)
                                 + "  number of ellements is different than section: # SweepPoints=" 
-                                                + str(val_SweepPoints))
-                    if val_SweepPoints != len(adata.frequencies):
-                        flag_ok = False
-                        adata.errors.append("On line " + str(n) 
-                                + "  number of ellements " + str(val_SweepPoints) 
-                                + " is different than the original number of frequencies " 
-                                + str(len(adata.frequencies)))
+                                                + str(val_SweepPoints))                    
                     if flag_ok:
                         #adata.data_matrix.append([sweepStart, sweepStop] + values)
-                        adata.data_matrix.append(values)
-                        adata.sweep_start.append(sweepStart)
-                        adata.sweep_stop.append(sweepStop)
+                        data_matrix0.append(values)
+                        sweep_start0.append(sweepStart)
+                        sweep_stop0.append(sweepStop)
 
                 #Reset work variables
                 flag_frequencies = False
                 val_SweepFrequencies = -1
                 val_SweepPoints = -1
                 sweepStart = None
-                sweepStop = None           
+                sweepStop = None
+    # Data cleanup
+    # Remove data lines with less points than the current max frequency list lenght
+    for i in range(len(data_matrix0)):
+        if len(data_matrix0[i]) == len(adata.frequencies):
+            adata.data_matrix.append(data_matrix0[i])
+            adata.sweep_start.append(sweep_start0[i])
+            adata.sweep_stop.append(sweep_stop0[i])
+        else:
+            adata.errors.append("Matrix line " + str(i+1)
+                                + "  contains less data points, " + str(len(data_matrix0[i])) + 
+                                ", then the number of frequrncies: " + str(len(adata.frequencies)))
+    
     return adata
 
 def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
