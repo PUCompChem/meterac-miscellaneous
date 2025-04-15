@@ -62,7 +62,10 @@ class PlotConfig:
         self.x_ticks_index_step = 1000
         self.y_ticks_index_step = 100
         self.hide_x_ticks = False
-    
+        self.vmin = -150
+        self.vmax = 0
+        self.set_vmin_vmax = True
+        self.color_map = "YlGnBu"
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     tokens = s.split(splitter)
@@ -155,11 +158,14 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
 
     if pconf.plottype == "imshow":
         Z = np.array(adata.data_matrix, dtype='float32')
-        im = plt.imshow(Z, cmap='YlGnBu', aspect='auto')
+        im = None
+        if pconf.set_vmin_vmax:
+            im = plt.imshow(Z, cmap=pconf.color_map, aspect='auto', vmin = pconf.vmin, vmax = pconf.vmax)
+        else:
+            im = plt.imshow(Z, cmap=pconf.color_map, aspect='auto')    
         if pconf.hide_x_ticks:
             ax.set_xticks([])
-            ax.spines['bottom'].set_visible(False)
-            #ax.axes.get_xaxis().set_visible(False)               
+            #ax.spines['bottom'].set_visible(False)
         else:    
             xticks = adata.get_x_ticks_with_step(pconf.x_ticks_index_step)
             ax.set_xticks(xticks, adata.get_x_ticks_labels(xticks))
