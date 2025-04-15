@@ -3,12 +3,13 @@ import numpy as np
 
 class AaroniaData:
     def __init__(self):        
-        self.frequencies = []
+        self.frequencies = None
         self.data_matrix = []
         self.sweep_start = []
         self.sweep_stop = []
         self.frequency_unit = "MHz"
         self.frequency_factor = 1.0e-6
+        self.errors = []
     
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
@@ -49,6 +50,10 @@ class AaroniaData:
         for i in y_indices:
             labels.append(str(self.sweep_stop[i]))
         return labels
+    
+    def print_errors(self):
+        for err in self.errors:
+            print(err)
 
 class PlotConfig:
     def __init__(self): 
@@ -80,6 +85,8 @@ def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
 def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
     adata = AaroniaData()
     flag_frequencies = False
+    val_SweepFrequencies = -1
+    val_SweepPoints = -1
     sweepStart = None
     sweepStop = None
     
@@ -94,26 +101,62 @@ def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
             #print(n,line)
             if (line.startswith("#")):
                 if (line.startswith("# SweepFrequencies=")):
-                   flag_frequencies = True
-                   continue 
+                    val_SweepFrequencies = int(line.strip()[19:])
+                    if adata.frequencies != None:
+                        if val_SweepFrequencies != len(adata.frequencies):
+                            adata.errors.append("On line " + str(n) + " " + line
+                                    + "  number frequencies is different than the first sweep: "
+                                    + str(len(adata.frequencies)))
+                    flag_frequencies = True
+                    continue 
                 if (line.startswith("# SweepStart=")):
                     sweepStart = line.strip()[13:]
                     continue
                 if (line.startswith("# SweepStop=")):
                     sweepStop = line.strip()[12:]
                     continue
+                if (line.startswith("# SweepPoints=")):
+                    val_SweepPoints = int(line.strip()[14:])
+                    continue
                 continue    
             else:
                 values = float_values_from_string(line)
                 if flag_frequencies:
-                    adata.frequencies = values
+                    if adata.frequencies == None:
+                        #adding the frequencies from first occurence of line: # SweepFrequencies=
+                        adata.frequencies = values
+                    else:
+                        if val_SweepFrequencies != len(values):
+                            adata.errors.append("On line " + str(n) 
+                                                + "  number of ellements is different than section: # SweepFrequencies=" 
+                                                + str(val_SweepFrequencies))
                 else:
-                    #adata.data_matrix.append([sweepStart, sweepStop] + values)
-                    adata.data_matrix.append(values)
-                    adata.sweep_start.append(sweepStart)
-                    adata.sweep_stop.append(sweepStop)
+                    flag_ok = True
+                    if val_SweepPoints == -1:
+                        flag_ok = False
+                        adata.errors.append("On line " + str(n)
+                                + "  line with secton '# SweepPoints=' is missing")
+                    if val_SweepPoints != len(values):
+                        flag_ok = False
+                        adata.errors.append("On line " + str(n)
+                                + "  number of ellements is different than section: # SweepPoints=" 
+                                                + str(val_SweepPoints))
+                    if val_SweepPoints != len(adata.frequencies):
+                        flag_ok = False
+                        adata.errors.append("On line " + str(n) 
+                                + "  number of ellements " + str(val_SweepPoints) 
+                                + " is different than the original number of frequencies " 
+                                + str(len(adata.frequencies)))
+                    if flag_ok:
+                        #adata.data_matrix.append([sweepStart, sweepStop] + values)
+                        adata.data_matrix.append(values)
+                        adata.sweep_start.append(sweepStart)
+                        adata.sweep_stop.append(sweepStop)
+
                 #Reset work variables
                 flag_frequencies = False
+                val_SweepFrequencies = -1
+                val_SweepPoints = -1
                 sweepStart = None
                 sweepStop = None           
     return adata
