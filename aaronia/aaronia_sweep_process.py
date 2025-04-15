@@ -70,7 +70,7 @@ class PlotConfig:
         self.vmin = -150
         self.vmax = 0
         self.set_vmin_vmax = True
-        self.color_map = "YlGnBu"
+        self.color_map = "gist_ncar_r" #"YlGnBu"
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     tokens = s.split(splitter)
@@ -187,7 +187,7 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
     
     fig, ax = [None, None]
     if fileName == None:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height))
     else:
          fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height), dpi = pconf.file_dpi)   
     
