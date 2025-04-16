@@ -208,7 +208,7 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
     if fileName == None:
         fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height))
     else:
-         fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height), dpi = pconf.file_dpi)   
+        fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height), dpi = pconf.file_dpi)   
     
     if pconf.plottype == "pcolormesh": 
         X = np.array(adata.frequencies, dtype='float32')   
@@ -239,3 +239,32 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
         plt.show() #showing the plot in a GUI window
     else:
         plt.savefig(fileName, bbox_inches='tight', pad_inches=pconf.file_padding)
+
+
+def get_min_max_average_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig = None):
+    pconf = plotConfig
+    if pconf == None:        
+        pconf = PlotConfig()  #using default configuration
+    
+    fig, ax = [None, None]
+    if fileName == None:
+        fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height))
+    else:
+        fig, ax = plt.subplots(figsize=(pconf.figure_width, pconf.figure_height), dpi = pconf.file_dpi)
+
+    #xticks = adata.get_x_ticks_with_step(pconf.x_ticks_index_step)
+    #ax.set_xticks(xticks, adata.get_x_ticks_labels(xticks))
+
+    freq = np.array(adata.frequencies, dtype='float32')*adata.frequency_factor
+    ax.plot(freq, adata.min_spectrum, label='min')
+    ax.plot(freq, adata.max_spectrum, label='max')
+    ax.plot(freq, adata.average_spectrum, label='average')
+    ax.set_xlabel("frequency [MHz]")
+    ax.set_ylabel("signal [dB]")
+    ax.legend()
+
+    if fileName == None:    
+        plt.show() #showing the plot in a GUI window
+    else:
+        plt.savefig(fileName, bbox_inches='tight', pad_inches=pconf.file_padding)
+
