@@ -3,13 +3,16 @@ import numpy as np
 
 class AaroniaData:
     def __init__(self):        
-        self.frequencies = None
+        self.frequencies = None #list[float]
         self.data_matrix = []
         self.sweep_start = []
         self.sweep_stop = []
         self.frequency_unit = "MHz"
         self.frequency_factor = 1.0e-6
         self.errors = []
+        self.min_spectrum = None   #np NDArray
+        self.max_spectrum = None   #np NDArray
+        self.average_spectrum = None  #np NDArray
     
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
@@ -54,6 +57,12 @@ class AaroniaData:
     def print_errors(self):
         for err in self.errors:
             print(err)
+    
+    def calc_basic_spectrum_statistics(self):
+        z = np.array(self.data_matrix, dtype='float32')
+        self.average_spectrum = np.mean(z, axis=0)
+        self.min_spectrum = np.min(z, axis=0)
+        self.max_spectrum = np.max(z, axis=0)
 
 class PlotConfig:
     def __init__(self): 
@@ -204,7 +213,7 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
     if pconf.plottype == "pcolormesh": 
         X = np.array(adata.frequencies, dtype='float32')   
         Y = np.array(adata.sweep_stop, dtype='str')
-        Z = np.array(adata.data_matrix, dtype='float32')
+         
         pc = ax.pcolormesh(X, Y, Z, vmin=-70, vmax=-40, cmap='RdBu_r')
         #fig.colorbar(pc, ax)
         ax.set_title('pcolormesh()')
