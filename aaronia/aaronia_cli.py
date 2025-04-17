@@ -6,6 +6,7 @@ import sys
 from aaronia_sweep_process import *
 
 errors_out = []
+allowed_operation_list = ["wf-plot", "min-max-plot", "stat", "average-spectrum"]
 
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool):
@@ -71,26 +72,26 @@ def check_standard_option(opt: str) -> str:
         errors_out.append("Option -i (--input) has no argument!")
         num_of_errors += 1
     
-    pass
-
 def print_help(options: list[CLIOption]):
     print("CLI application for managing aaronia data.")
     print("Basic input arguments: ...")
     print("Full argument list:")
-    print("   -i <input-file> -o <output-file> -v")
+    print("   -i <input-file> -o <output-file> -v -p <operations-list>")
     
-
 
 #Setting CLI options and default file names
 options = [CLIOption("i","input", True), 
-           CLIOption("o","output", False),          
-           CLIOption("p","operation", False),
+           CLIOption("o","output", True),          
+           CLIOption("p","operations", True),
+           CLIOption("c","config", True),
            CLIOption("v","verbose", False),           
            CLIOption("h","help", False)]
 
 input_file = None
 output_file = None
-operation = "heatmap"
+operations_str = "wf-plot, min-max-plot, stat, average-spectrum"
+operations = []
+flag_default_operations = False
 
 #Handle CLI input arguments
 num_of_errors = 0
@@ -106,7 +107,7 @@ flag_verbose = "verbose" in arguments["boolean_options"]
 if "input" in arguments["standard_options"].keys():
     fname = arguments["standard_options"]["input"]
     if fname != None:
-        ics_data_file = fname
+        input_file = fname
     else:
         errors_out.append("Option -i (--input) has no argument!")
         num_of_errors += 1
@@ -114,9 +115,41 @@ else:
     errors_out.append("Option -i (--input) is requred!")
     num_of_errors += 1
 
+if "output" in arguments["standard_options"].keys():
+    fname = arguments["standard_options"]["output"]
+    if fname != None:
+        output_file = fname
+    else:
+        errors_out.append("Option -o (--output) has no argument!")
+        num_of_errors += 1
+else:
+    errors_out.append("Option -o (--output) is requred!")
+    num_of_errors += 1
+
+if "operations" in arguments["standard_options"].keys():
+    operations_str = arguments["standard_options"]["operations"]
+else:
+    if flag_verbose:
+        print("Performing default operations: ", operations_str)
+        flag_default_operations = True     
+#Extract operations from string
+tokens = operations_str.split(",")
+for tok in tokens:    
+    op = tok.strip()
+    if op != '':
+        operations.append(op)
+#Check operations
+for op in operations:
+    if not (op in allowed_operation_list):        
+        errors_out.append("Incorrect operation: " + op)
+        num_of_errors += 1
 
 if num_of_errors > 0:
     print("  No operation is performed!")
     for err_line in errors_out:
         print("  " + err_line)
     exit()
+
+#Performs operations
+if flag_verbose and (not flag_default_operations):
+    print("Performing operations: ", operations_str)
