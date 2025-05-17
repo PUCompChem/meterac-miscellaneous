@@ -3,10 +3,13 @@ Console app for managing aaronia data
 '''
 
 import sys
+import os
+sys.path.append("./")
 from aaronia_sweep_process import *
 
 errors_out = []
 allowed_operation_list = ["wf-plot", "min-max-plot", "stat", "average-spectrum"]
+operations_str = "wf-plot, min-max-plot, stat, average-spectrum"
 
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool):
@@ -74,10 +77,11 @@ def check_standard_option(opt: str) -> str:
     
 def print_help(options: list[CLIOption]):
     print("CLI application for managing aaronia data.")
-    print("Basic input arguments: ...")
+    #print("Basic input arguments: ...")
     print("Full argument list:")
     print("   -i <input-file> -o <output-file> -v -p <operations-list>")
-    
+    print("If operation is missing all possible operations are performed: ")
+    print("      " + "wf-plot, min-max-plot, stat, average-spectrum")
 
 #Setting CLI options and default file names
 options = [CLIOption("i","input", True), 
@@ -89,7 +93,7 @@ options = [CLIOption("i","input", True),
 
 input_file = None
 output_file = None
-operations_str = "wf-plot, min-max-plot, stat, average-spectrum"
+
 operations = []
 flag_default_operations = False
 
@@ -121,10 +125,11 @@ if "output" in arguments["standard_options"].keys():
         output_file = fname
     else:
         errors_out.append("Option -o (--output) has no argument!")
-        num_of_errors += 1
+        num_of_errors += 1        
 else:
-    errors_out.append("Option -o (--output) is requred!")
-    num_of_errors += 1
+    #errors_out.append("Option -o (--output) is requred!")
+    #num_of_errors += 1
+    pass
 
 if "operations" in arguments["standard_options"].keys():
     operations_str = arguments["standard_options"]["operations"]
@@ -153,3 +158,21 @@ if num_of_errors > 0:
 #Performs operations
 if flag_verbose and (not flag_default_operations):
     print("Performing operations: ", operations_str)
+
+#Load and parse aaronia data file
+adata = extract_data_from_aaronia_file(input_file)
+if flag_verbose and len(adata.errors) > 0:
+    print("There are ", len(adata.errors), " errors on loading aaronia data:")
+    adata.print_errors()
+
+#Handle input file name and prepare output file names
+input_dir, input_file_name = os.path.split(input_file)
+if output_file == None:
+    print("Using input file directory for output: " + input_dir)
+    output_file = input_dir
+
+out_file_prefix = "aaronia-cli-out"
+dot_index = input_file_name.rfind(".")
+if dot_index != -1:
+    out_file_prefix = input_file_name[:dot_index]
+#print(out_file_prefix)
