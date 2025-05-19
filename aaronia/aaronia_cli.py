@@ -91,6 +91,20 @@ options = [CLIOption("i","input", True),
            CLIOption("v","verbose", False),           
            CLIOption("h","help", False)]
 
+pconf = None
+
+def set_plot_config():
+    pconf = PlotConfig()
+    pconf.x_ticks_index_step = 500
+    pconf.file_dpi = 300
+    pconf.figure_width = 12
+    pconf.figure_height = 6
+    pconf.file_padding = 0.05
+    pconf.y_ticks_index_step = 80
+    #pconf.hide_x_ticks = True
+    pconf.color_map = "gist_ncar_r"
+    pconf.set_vmin_vmax = False
+
 input_file = None
 output_file = None
 
@@ -175,4 +189,13 @@ out_file_prefix = "aaronia-cli-out"
 dot_index = input_file_name.rfind(".")
 if dot_index != -1:
     out_file_prefix = input_file_name[:dot_index]
+
 #print(out_file_prefix)
+if "wf-plot" in operations:
+    if flag_verbose:
+        print("wf-plot: genrating waterfall heatmap")
+    figFileName = os.path.join(output_file,out_file_prefix+".png")
+    if flag_verbose:
+        print("waterfall heatmap output:",figFileName)
+    set_plot_config()
+    get_heatmap_plot(adata, plotConfig = pconf, fileName = figFileName)
