@@ -11,8 +11,9 @@ class Descriptor:
         self.info = info
 
 descriptor_list = [
-    Descriptor(name = "mean"),
-    Descriptor(name = "rms")
+    Descriptor("mean"),
+    Descriptor("rms"),
+    Descriptor("stdev"),
     ]
 
 class DescriptorValue:
@@ -26,7 +27,7 @@ class DescriptorValue:
 
 
 class CalcSignalDescriptors:
-    def __init__(self, signal: list[float], descriptors: list[str]): 
+    def __init__(self, signal: list[float], descriptors: list[str] = None): 
         self.signal = signal  
         self.descriptors = descriptors
         #TODO handle None descriptors
@@ -40,7 +41,9 @@ class CalcSignalDescriptors:
         if name == "mean":
             return self.calculateMean()
         if name == "rms":
-            return self.calculateRMS()        
+            return self.calculateRMS()
+        if name == "stdev":
+            return self.calculateStDev()       
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
         
     def calculateMean(self) -> DescriptorValue:
@@ -50,4 +53,9 @@ class CalcSignalDescriptors:
     def calculateRMS(self) -> DescriptorValue:
         arr = np.array(self.signal)
         val = np.sqrt(np.mean(arr**2))
+        return DescriptorValue(floatValue = val)
+    
+    def calculateStDev(self) -> DescriptorValue:
+        #arr = np.array(self.signal)
+        val = np.std(self.signal)
         return DescriptorValue(floatValue = val)
