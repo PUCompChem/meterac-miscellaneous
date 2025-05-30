@@ -1,35 +1,35 @@
-from pydantic import BaseModel, validator
 import numpy as np
 
 
-allowed_descriptor_types = ["number", "list"]
+allowed_descriptor_types = ["number", "list", "text"]
 
 
-class Descriptor(BaseModel):
-    name: str = ""
-    info: str = None
-    type: str = "number"
-
-    @validator("type")
-    def validate_option(cls, v):
-        assert v in allowed_descriptor_types , "must be in " + str(allowed_descriptor_types)
-        return v
+class Descriptor:
+    def __init__(self, name: str, typestr:str = "number", info: str = None):
+        self.name = name
+        self.typestr = typestr
+        self.info = info
 
 descriptor_list = [
     Descriptor(name = "mean"),
     Descriptor(name = "rms")
     ]
 
-class DescriptorValue(BaseModel):
-    floatValue: float =  None
-    listValue: list[float] = None
-    errorMsg: str = None
-    info: str = None
+class DescriptorValue:
+    def __init__(self, floatValue: float = None, listValue: list[float] = None, textValue: str = None,
+                  errorMsg: str = None, info: str = None):
+        self.floatValue = floatValue
+        self.listValue = listValue
+        self.textValue = textValue
+        self.errorMsg = errorMsg
+        self.info = info
 
 
-class CalcSignalDescriptors(BaseModel):
-    signal: list[float] = None
-    descriptors: list[str] = None
+class CalcSignalDescriptors:
+    def __init__(self, signal: list[float], descriptors: list[str]): 
+        self.signal = signal  
+        self.descriptors = descriptors
+        #TODO handle None descriptors
         
     def calculate(self) -> dict[str, DescriptorValue]:
         #TODO
