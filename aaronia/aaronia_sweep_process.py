@@ -13,6 +13,7 @@ class AaroniaData:
         self.min_spectrum = None   #np NDArray
         self.max_spectrum = None   #np NDArray
         self.average_spectrum = None  #np NDArray
+        self.delta_spectrum = None  #np NDArray
     
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
@@ -63,6 +64,10 @@ class AaroniaData:
         self.average_spectrum = np.mean(z, axis=0)
         self.min_spectrum = np.min(z, axis=0)
         self.max_spectrum = np.max(z, axis=0)
+        self.delta_spectrum =  self.max_spectrum - self.min_spectrum  
+
+    def print_basic_metrics(self):
+        pass   
 
 class PlotConfig:
     def __init__(self): 
