@@ -5,6 +5,7 @@ A simple console app for calculation of cross sensitivity
 import sys
 sys.path.append("./")
 from cross_sensitivity import *
+from ioutils import *
 
 errors_out = []
 
@@ -88,10 +89,19 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("u","uncorrected", False),
            CLIOption("v","verbose", False),
            CLIOption("n","negative-correction", True),
+           CLIOption("f","measurements-file", True),
+           CLIOption("o","output-file", True),
+           CLIOption("d","column-indices", True),
+           CLIOption("x","max-number-of-measurements", True),
            CLIOption("h","help", False)]
+
 ics_data_file = "./data/ics_data01.txt"        #default value
 cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
+measurements_file = None
+output_file = None
+column_indices = []
+max_number_of_measurements = None
 
 #Handle CLI input arguments
 # ID T V1 V2 ...Vn -i <ics-file> -c <cs-file> -u -v
@@ -137,6 +147,43 @@ if "negative-correction" in arguments["standard_options"].keys():
         errors_out.append("Option -n (--negative-correction) has no argument!")
         num_of_errors += 1
 
+#Get measurements file
+if "measurements-file" in arguments["standard_options"].keys():
+    measurements_file = arguments["standard_options"]["measurements-file"]
+    if measurements_file == None:
+        errors_out.append("Option -f (--measurements-file) has no argument!")
+        num_of_errors += 1
+
+#Get column indices and max-number-of-measurements
+if measurements_file != None:
+    if "column-indices" in arguments["standard_options"].keys():
+        column_indices_str = arguments["standard_options"]["column-indices"]
+        tokens = column_indices_str.split(",")
+        for tok in tokens:
+            c = None
+            try:
+                ind = int(tok)
+                column_indices.append(ind) 
+            except Exception as e:
+                errors_out.append("Incorrect index token in --d(-column-indices) option " + tok)
+                num_of_errors += 1
+
+    if "max-number-of-measurements" in arguments["standard_options"].keys():
+        max_num_str = arguments["standard_options"]["max-number-of-measurements"]
+        try:
+            max_val = int(max_num_str)
+            max_number_of_measurements = max_val            
+        except Exception as e:            
+            errors_out.append("Incorrect -x (--max-number-of-measurements) option " + max_num_str)
+            num_of_errors += 1
+    
+#Get output file
+if "output-file" in arguments["standard_options"].keys():
+    output_file = arguments["standard_options"]["output-file"]
+    if output_file == None:
+        errors_out.append("Option -o (--output-file) has no argument!")
+        num_of_errors += 1
+
 if flag_verbose:
     print("ics data is loaded from file: " + ics_data_file)
     print("cs settings are loaded from file: " + cs_setting_file)
@@ -152,6 +199,31 @@ n = cscd.num_of_sensors
 id = None
 voltages = []
 T = None
+
+#Perform caclulations for measurements data from file
+if measurements_file != None:
+    print("num_of_errors: ", num_of_errors)
+    if num_of_errors > 0:
+        print(str(num_of_errors) + #First output token a aproblem flag (number of errors)
+            "  No calculation is performed. Found " + str(num_of_errors) + " error/s!")
+        for err_line in errors_out:
+            print(err_line)
+        exit()
+
+    print("working with measurements file: ", measurements_file)
+    print("Using columns with indices: ", column_indices)
+    
+    measurements = load_data(measurements_file, "auto")
+    line_count = 0
+    for line in measurements:
+        line_count +=1
+        if line_count > max_number_of_measurements:
+            break
+        print (line)
+       
+
+    exit() # the deafault argumetns from command lines are not used 
+
 
 #Parse arguments
 if flag_verbose:
