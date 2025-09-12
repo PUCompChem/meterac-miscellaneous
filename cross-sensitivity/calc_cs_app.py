@@ -100,8 +100,10 @@ cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
 measurements_file = None
 output_file = None
+output_file_separator = ","
 column_indices = []
 max_number_of_measurements = None
+
 
 #Handle CLI input arguments
 # ID T V1 V2 ...Vn -i <ics-file> -c <cs-file> -u -v
@@ -200,14 +202,26 @@ id = None
 voltages = []
 T = None
 
+
 #Perform caclulations for measurements data from file
 if measurements_file != None:
+    #indices for raw data: -d 3,9,14,16,17,19,21
+    id_index = -1
+    T_index = -1
+    V_indices = []
+
     if len(column_indices) != n+2:
         errors_out.append("Incorrect number of column indices (option -d)")
         errors_out.append("Expected indices for: ID T V1 V2 ... Vn")       
         num_of_errors += 1
+    else:
+        #for all indices: 1-base --> 0-base transforms is done
+        id_index = column_indices[0] - 1 
+        T_index = column_indices[1] - 1
+        for i in range(n):
+            V_indices.append(column_indices[2+i] - 1)
+        print("V_indices: ", V_indices)        
 
-    #print("num_of_errors: ", num_of_errors)
     if num_of_errors > 0:
         print(str(num_of_errors) + #First output token a aproblem flag (number of errors)
             "  No calculation is performed. Found " + str(num_of_errors) + " error/s!")
@@ -225,8 +239,32 @@ if measurements_file != None:
         if line_count > max_number_of_measurements:
             break
         #print (line)
-       
+        
+        #Prepare input data for calcuation
+        id = line[id_index]
+        T = float(line[T_index])
+        voltages = []
+        for i in range(n):            
+            voltages.append(float(line[V_indices[i]]))
+        print("id = ", id, "T=", T, "V1=", voltages[0], "V2=", voltages[1], 
+              "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4])
 
+        
+        #print("Calculating non corrected concentrations:")        
+        b = calc_b(id, voltages, T,  cscd)
+        output_s = "0  "
+        for i in range(n):
+            output_s += str(b[i]) + " "
+        print(output_s)
+                
+        C = calc_concentrations(id,voltages, T,  cscd)
+        if flag_negative_correction:
+            correct_negative_values(C)
+        output_s = "0  "  #First output token is the OK flag (no errors)
+        for i in range(n):
+            output_s += str(C[i,0]) + " "
+        print(output_s)
+        
     exit() # the deafault argumetns from command lines are not used 
 
 
