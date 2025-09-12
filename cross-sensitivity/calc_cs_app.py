@@ -3,6 +3,7 @@ A simple console app for calculation of cross sensitivity
 '''
 
 import sys
+sys.path.append("./")
 from cross_sensitivity import *
 
 errors_out = []
