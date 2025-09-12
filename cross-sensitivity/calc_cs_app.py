@@ -202,7 +202,12 @@ T = None
 
 #Perform caclulations for measurements data from file
 if measurements_file != None:
-    print("num_of_errors: ", num_of_errors)
+    if len(column_indices) != n+2:
+        errors_out.append("Incorrect number of column indices (option -d)")
+        errors_out.append("Expected indices for: ID T V1 V2 ... Vn")       
+        num_of_errors += 1
+
+    #print("num_of_errors: ", num_of_errors)
     if num_of_errors > 0:
         print(str(num_of_errors) + #First output token a aproblem flag (number of errors)
             "  No calculation is performed. Found " + str(num_of_errors) + " error/s!")
@@ -219,7 +224,7 @@ if measurements_file != None:
         line_count +=1
         if line_count > max_number_of_measurements:
             break
-        print (line)
+        #print (line)
        
 
     exit() # the deafault argumetns from command lines are not used 
