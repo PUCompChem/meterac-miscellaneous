@@ -259,21 +259,30 @@ def parse_properties(props: dict) -> CSCalcData:
 
 def calc_work_matrix(cscd: CSCalcData):
     '''
-    Calculatin a work matrix for solving a system of ecuations for { Ci | i = 1..n }
-        Ci = Vi/ICSi .TCSi(T).Ri  + ZSi(T) + Summa(CSij.Cj | for all j != i)
-
+    Calculatin of a work matrix for solving a system of equations for { Ci | i = 1..n }
+        Ci = Vi/(ICSi .TCSi(T).Ri)  - ZSi(T)/TCSi(T) + Summa(CSij.Cj | for all j != i)
+        
     denote:
-        bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T) 
+        bi = Vi/(ICSi .TCSi(T).Ri)  - ZSi(T)/TCSi(T) 
 
-    then the system is reformulated 
+    then the system is reformulated: 
         Ci = bi + Summa(CSij.Cj)
 
-    and additionally 
-        Ci - Summa(CSij.Cj) = bi  
+    and finaly: 
+        1.0*Ci - Summa(CSij.Cj) = bi  
 
     Hence:
-        the working matrix is the CS matrix 
-        with reverse sign of the non diagonal elements      
+        the working matrix, A, is the CS (cross sensitivity) matrix 
+        with reverse sign of the non diagonal elements
+        In the CS matrix, the diagonal elements must be equal to 1
+
+    ----------------------------------------------------
+    old wrong formulas:
+        Ci = Vi/(ICSi .TCSi(T).Ri)  + ZSi(T) + Summa(CSij.Cj | for all j != i)
+        bi = Vi/(ICSi .TCSi(T).Ri)  + ZSi(T)
+        The major error was the sign infront of ZSi(T) --> Zero shift must be substracted not added
+        Also according the CPEC sensors application notes,
+        Temperature Coefficient of Span correction is applied after zero shift (base line) correction  
     '''
 
     n = cscd.num_of_sensors
@@ -329,14 +338,17 @@ def get_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
     return ics_values[sensor_num]
 
 def calc_b(device: str, voltages: list[float], temperature:float, cscd: CSCalcData) -> list[float]:
-    # bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
+    # bi = Vi/(ICSi .TCSi(T).Ri)  - ZSi(T)/TCSi(T)
+    # ---------------------------------------------------
+    # old wrong formula bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
     n = len(voltages)
     b = []
     for i in range(n):
         tcs_i = calc_TCS(i, temperature, cscd)
         ics_i = get_ICS(device, i, cscd)
         zs_i = calc_ZS(i, temperature, cscd)
-        b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) + zs_i
+        b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) - zs_i / tcs_i
+        # b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) + zs_i
         b.append(b_i)
     return b
 
