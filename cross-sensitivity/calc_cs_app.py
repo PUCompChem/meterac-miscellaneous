@@ -81,9 +81,12 @@ def print_help(options: list[CLIOption]):
     print("The application works with default data files:")
     print("   ./data/ics_data01.txt")
     print("   ./data/cs_settings01.txt")
+    print("Full list of options:")
+    for opt in options:
+        print("-"+opt.shortName + "  --" + opt.longName)
 
 
-#Setting CLI options and default file names
+#Setting CLI options and default file names0
 options = [CLIOption("i","ics-data", True), 
            CLIOption("c","cs-settings", True),
            CLIOption("u","uncorrected", False),
@@ -93,6 +96,7 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("o","output-file", True),
            CLIOption("d","column-indices", True),
            CLIOption("x","max-number-of-measurements", True),
+           CLIOption("r","old-version", False),
            CLIOption("h","help", False)]
 
 ics_data_file = "./data/ics_data01.txt"        #default value
@@ -103,6 +107,7 @@ output_file = None
 output_file_separator = ","
 column_indices = []
 max_number_of_measurements = None
+flag_old_version = False
 
 
 #Handle CLI input arguments
@@ -115,6 +120,7 @@ if flag_help:
     exit()
 flag_uncorrected = "uncorrected" in arguments["boolean_options"]
 flag_verbose = "verbose" in arguments["boolean_options"]
+flag_old_version = "old-version" in arguments["boolean_options"]
 
 #Get ics-data from input path
 if "ics-data" in arguments["standard_options"].keys():
@@ -220,7 +226,7 @@ if measurements_file != None:
         T_index = column_indices[1] - 1
         for i in range(n):
             V_indices.append(column_indices[2+i] - 1)
-        print("V_indices: ", V_indices)        
+        print("V_indices: ", V_indices)      
 
     if num_of_errors > 0:
         print(str(num_of_errors) + #First output token a aproblem flag (number of errors)
@@ -250,14 +256,22 @@ if measurements_file != None:
               "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4])
 
         
-        #print("Calculating non corrected concentrations:")        
-        b = calc_b(id, voltages, T,  cscd)
+        #print("Calculating non corrected concentrations:")
+        if flag_old_version:
+            b = calc_b_00(id, voltages, T,  cscd)   
+        else:      
+            b = calc_b(id, voltages, T,  cscd)
+
         output_s = "0  "
         for i in range(n):
             output_s += str(b[i]) + " "
         print(output_s)
-                
-        C = calc_concentrations(id,voltages, T,  cscd)
+
+        if flag_old_version:        
+            C = calc_concentrations_00(id,voltages, T,  cscd)
+        else:
+            C = calc_concentrations(id,voltages, T,  cscd)
+
         if flag_negative_correction:
             correct_negative_values(C)
         output_s = "0  "  #First output token is the OK flag (no errors)
@@ -302,13 +316,20 @@ if flag_verbose:
 if num_of_errors == 0:
     if flag_uncorrected:
         #print("Calculating non corrected concetrations:")
-        b = calc_b(id,voltages, T,  cscd)
+        if flag_old_version:
+            b = calc_b_00(id,voltages, T,  cscd)
+        else:
+            b = calc_b(id,voltages, T,  cscd)    
         output_s = "0  "
         for i in range(n):
             output_s += str(b[i]) + " "
         print(output_s)
     else:
-        C = calc_concentrations(id,voltages, T,  cscd)
+        if flag_old_version:
+            C = calc_concentrations_00(id,voltages, T,  cscd)
+        else:
+            C = calc_concentrations(id,voltages, T,  cscd)
+
         if flag_negative_correction:
             correct_negative_values(C)
         output_s = "0  "  #First output token is the OK flag (no errors)

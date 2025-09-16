@@ -359,6 +359,26 @@ def calc_concentrations(device: str, voltages: list[float], temperature:float, c
     c = np.matmul(invA,b_matrix)
     return c
 
+# old function version
+def calc_b_00(device: str, voltages: list[float], temperature:float, cscd: CSCalcData) -> list[float]:
+    # old wrong formula bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
+    n = len(voltages)
+    b = []
+    for i in range(n):
+        tcs_i = calc_TCS(i, temperature, cscd)
+        ics_i = get_ICS(device, i, cscd)
+        zs_i = calc_ZS(i, temperature, cscd)
+        b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) + zs_i
+        b.append(b_i)
+    return b
+
+# old function version (uses calc_b_00())
+def calc_concentrations_00(device: str, voltages: list[float], temperature:float, cscd: CSCalcData):
+    b = calc_b_00(device, voltages, temperature, cscd)
+    b_matrix = np.array([b]).transpose()
+    invA = np.array(get_inv_work_matrix(cscd))
+    c = np.matmul(invA,b_matrix)
+    return c
 
 def outputCSResult(cscd: CSCalcData, sep: str):
     print("Working matrix (A)")
