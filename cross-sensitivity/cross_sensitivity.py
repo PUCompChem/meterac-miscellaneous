@@ -347,7 +347,7 @@ def calc_b(device: str, voltages: list[float], temperature:float, cscd: CSCalcDa
         tcs_i = calc_TCS(i, temperature, cscd)
         ics_i = get_ICS(device, i, cscd)
         zs_i = calc_ZS(i, temperature, cscd)
-        b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) - zs_i / tcs_i
+        b_i=voltages[i]*cscd.signal_scaling / (cscd.ics_unit_scaling*ics_i*tcs_i* cscd.R[i]) - zs_i / tcs_i
         # b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) + zs_i
         b.append(b_i)
     return b
@@ -368,7 +368,7 @@ def calc_b_00(device: str, voltages: list[float], temperature:float, cscd: CSCal
         tcs_i = calc_TCS(i, temperature, cscd)
         ics_i = get_ICS(device, i, cscd)
         zs_i = calc_ZS(i, temperature, cscd)
-        b_i=voltages[i]*cscd.signal_scaling / (ics_i*tcs_i* cscd.R[i]) + zs_i
+        b_i=voltages[i]*cscd.signal_scaling / (cscd.ics_unit_scaling*ics_i*tcs_i* cscd.R[i]) + zs_i
         b.append(b_i)
     return b
 
