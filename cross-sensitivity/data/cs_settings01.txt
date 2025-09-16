@@ -1,7 +1,7 @@
 num_of_sensors = 5
 
-#this constant comes from the sensor technical specifications
-signal_scaling = 15.625
+#this constant, 15.625 uV/div, comes from the sensor technical specifications in 
+signal_scaling = 0.000015625
 
 #this is specific to the ICS values in nA/ppm
 ics_unit_scaling = 0.000000001
