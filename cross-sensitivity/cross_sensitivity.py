@@ -127,7 +127,7 @@ def parse_properties(props: dict) -> CSCalcData:
         except Exception as e:
             errors.append("ics_unit_scaling is not correct float: " + ics_unit_scaling_prop)
         else:
-            cscd.ics_unitl_scaling = us
+            cscd.ics_unit_scaling = us
     else:    
         errors.append("Property 'ics_unit_scaling' is missing")    
 

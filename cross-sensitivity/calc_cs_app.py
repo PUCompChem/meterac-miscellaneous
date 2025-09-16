@@ -196,6 +196,7 @@ if flag_verbose:
     print("ics data is loaded from file: " + ics_data_file)
     print("cs settings are loaded from file: " + cs_setting_file)
     print("Negative value correction = " + str(flag_negative_correction))
+   
 
 #Load basic settings for calculation
 if flag_verbose:
@@ -208,6 +209,9 @@ id = None
 voltages = []
 T = None
 
+if flag_verbose:
+    print("cs.signal_scaling = ", cscd.signal_scaling)
+    print("cs.ics_unit_scaling = ", cscd.ics_unit_scaling)
 
 #Perform caclulations for measurements data from file
 if measurements_file != None:
