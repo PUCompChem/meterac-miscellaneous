@@ -227,19 +227,21 @@ if flag_verbose:
 
 #Perform caclulations for measurements data from file
 if measurements_file != None:
-    #indices for raw data: -d 3,9,14,16,17,19,21
+    #example indices for raw data: -d 3,9,14,16,17,19,21,22
     id_index = -1
     T_index = -1
     V_indices = []
+    time_index = -1
 
-    if len(column_indices) != n+2:
+    if len(column_indices) != n+3:
         errors_out.append("Incorrect number of column indices (option -d)")
-        errors_out.append("Expected indices for: ID T V1 V2 ... Vn")       
+        errors_out.append("Expected indices for: ID T V1 V2 ... Vn time")       
         num_of_errors += 1
     else:
         #for all indices: 1-base --> 0-base transforms is done
         id_index = column_indices[0] - 1 
         T_index = column_indices[1] - 1
+        time_index = column_indices[n+2] - 1
         for i in range(n):
             V_indices.append(column_indices[2+i] - 1)
         print("V_indices: ", V_indices)      
@@ -266,6 +268,7 @@ if measurements_file != None:
                 header_line += "calc_nc_" + str(i+1) + output_file_separator
             for i in range(n):
                 header_line += "calc_" + str(i+1) + output_file_separator
+            header_line += "Time"
             out_file.write(header_line)
             out_file.write("\n")
         except:
@@ -283,12 +286,14 @@ if measurements_file != None:
         #Prepare input data for calcuation
         id = line[id_index]
         T = float(line[T_index])
+        time_str = line[time_index]
         voltages = []
+
         for i in range(n):            
             voltages.append(polarity_sign * float(line[V_indices[i]]))
         if flag_verbose:    
             print("id = ", id, "T=", T, "V1=", voltages[0], "V2=", voltages[1], 
-                "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4])
+                "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4], "Time= ", time_str)
         
         output_s_f = ""
         if output_file_name != None:
@@ -325,6 +330,8 @@ if measurements_file != None:
             output_s += str(C[i,0]) + " "
             if output_file_name != None:
                 output_s_f += str(C[i,0]) + output_file_separator
+        
+        output_s_f += time_str
 
         if flag_verbose:
             print(output_s)
