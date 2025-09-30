@@ -104,7 +104,7 @@ ics_data_file = "./data/ics_data01.txt"        #default value
 cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
 measurements_file = None
-output_file = None
+output_file_name = None
 output_file_separator = " "
 column_indices = []
 max_number_of_measurements = None
@@ -192,14 +192,14 @@ if measurements_file != None:
     
 #Get output file
 if "output-file" in arguments["standard_options"].keys():
-    output_file = arguments["standard_options"]["output-file"]
-    if output_file == None:
+    output_file_name = arguments["standard_options"]["output-file"]
+    if output_file_name == None:
         errors_out.append("Option -o (--output-file) has no argument!")
         num_of_errors += 1
     else:
-        if output_file.lower().endswith(".csv"):
+        if output_file_name.lower().endswith(".csv"):
            output_file_separator = ","
-        if output_file.lower().endswith(".tsv", ".txt"):
+        if output_file_name.lower().endswith((".tsv", ".txt")):
            output_file_separator = "\t"
 
 if flag_verbose:
@@ -254,6 +254,24 @@ if measurements_file != None:
     print("working with measurements file: ", measurements_file)
     print("Using columns with indices: ", column_indices)
     
+    out_file = None
+    if output_file_name != None:
+        try:
+            out_file = open(output_file_name, "w", encoding="utf-8")
+            #write header line
+            header_line = "id" + output_file_separator + "T" + output_file_separator
+            for i in range(n):
+                header_line += "v_" + str(i+1) + output_file_separator
+            for i in range(n):
+                header_line += "calc_nc_" + str(i+1) + output_file_separator
+            for i in range(n):
+                header_line += "calc_" + str(i+1) + output_file_separator
+            out_file.write(header_line)
+            out_file.write("\n")
+        except:
+             print("Error on opening file for writing: ", output_file_name)
+             exit()
+
     measurements = load_data(measurements_file, "auto")
     line_count = 0
     for line in measurements:
@@ -268,9 +286,16 @@ if measurements_file != None:
         voltages = []
         for i in range(n):            
             voltages.append(polarity_sign * float(line[V_indices[i]]))
-        print("id = ", id, "T=", T, "V1=", voltages[0], "V2=", voltages[1], 
-              "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4])
-
+        if flag_verbose:    
+            print("id = ", id, "T=", T, "V1=", voltages[0], "V2=", voltages[1], 
+                "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4])
+        
+        output_s_f = ""
+        if output_file_name != None:
+            output_s_f += id + output_file_separator
+            output_s_f += str(T) + output_file_separator
+            for i in range(n):
+                output_s_f += str(voltages[i]) + output_file_separator
         
         #print("Calculating non corrected concentrations:")
         if flag_old_version:
@@ -278,10 +303,14 @@ if measurements_file != None:
         else:      
             b = calc_b(id, voltages, T,  cscd)
 
-        output_s = "0  "
+        output_s = "0  "       
         for i in range(n):
             output_s += str(b[i]) + " "
-        print(output_s)
+            if output_file_name != None:
+                output_s_f += str(b[i]) + output_file_separator
+        
+        if flag_verbose:
+            print(output_s)
 
         if flag_old_version:        
             C = calc_concentrations_00(id,voltages, T,  cscd)
@@ -290,11 +319,27 @@ if measurements_file != None:
 
         if flag_negative_correction:
             correct_negative_values(C)
+        
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):
             output_s += str(C[i,0]) + " "
-        print(output_s)
-        
+            if output_file_name != None:
+                output_s_f += str(C[i,0]) + output_file_separator
+
+        if flag_verbose:
+            print(output_s)
+            
+        if output_file_name != None:
+            try:
+                out_file.write(output_s_f)
+                out_file.write("\n")
+            except:
+                print("Error writing on file...")    
+
+    
+    if output_file_name != None:
+        out_file.close()
+    
     exit() # the deafault argumetns from command lines are not used 
 
 
