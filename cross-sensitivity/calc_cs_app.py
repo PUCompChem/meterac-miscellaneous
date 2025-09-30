@@ -97,6 +97,7 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("d","column-indices", True),
            CLIOption("x","max-number-of-measurements", True),
            CLIOption("r","old-version", False),
+           CLIOption("p","polarity-reverse", False),
            CLIOption("h","help", False)]
 
 ics_data_file = "./data/ics_data01.txt"        #default value
@@ -108,7 +109,8 @@ output_file_separator = ","
 column_indices = []
 max_number_of_measurements = None
 flag_old_version = False
-
+polarity_reverse = False
+polarity_sign = +1.0
 
 #Handle CLI input arguments
 # ID T V1 V2 ...Vn -i <ics-file> -c <cs-file> -u -v
@@ -121,6 +123,9 @@ if flag_help:
 flag_uncorrected = "uncorrected" in arguments["boolean_options"]
 flag_verbose = "verbose" in arguments["boolean_options"]
 flag_old_version = "old-version" in arguments["boolean_options"]
+polarity_reverse = "polarity-reverse" in arguments["boolean_options"]
+if polarity_reverse:
+    polarity_sign = -1.0
 
 #Get ics-data from input path
 if "ics-data" in arguments["standard_options"].keys():
@@ -212,6 +217,8 @@ T = None
 if flag_verbose:
     print("cs.signal_scaling = ", cscd.signal_scaling)
     print("cs.ics_unit_scaling = ", cscd.ics_unit_scaling)
+    if polarity_reverse:
+        print("Input voltages sign is changed (polarity_reverse = True)")
 
 #Perform caclulations for measurements data from file
 if measurements_file != None:
@@ -255,7 +262,7 @@ if measurements_file != None:
         T = float(line[T_index])
         voltages = []
         for i in range(n):            
-            voltages.append(float(line[V_indices[i]]))
+            voltages.append(polarity_sign * float(line[V_indices[i]]))
         print("id = ", id, "T=", T, "V1=", voltages[0], "V2=", voltages[1], 
               "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4])
 
@@ -302,7 +309,7 @@ else:
         v = parse_float(main_arguments[2+i])
         if v == None:
             num_of_errors+=1
-        voltages.append(v)
+        voltages.append(polarity_sign * v)
 
 #Check device id
 if id != None:
