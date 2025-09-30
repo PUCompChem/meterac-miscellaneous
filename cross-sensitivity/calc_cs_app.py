@@ -105,7 +105,7 @@ cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
 measurements_file = None
 output_file = None
-output_file_separator = ","
+output_file_separator = " "
 column_indices = []
 max_number_of_measurements = None
 flag_old_version = False
@@ -196,6 +196,11 @@ if "output-file" in arguments["standard_options"].keys():
     if output_file == None:
         errors_out.append("Option -o (--output-file) has no argument!")
         num_of_errors += 1
+    else:
+        if output_file.lower().endswith(".csv"):
+           output_file_separator = ","
+        if output_file.lower().endswith(".tsv", ".txt"):
+           output_file_separator = "\t"
 
 if flag_verbose:
     print("ics data is loaded from file: " + ics_data_file)
