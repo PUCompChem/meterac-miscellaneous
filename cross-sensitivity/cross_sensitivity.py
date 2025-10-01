@@ -399,7 +399,7 @@ def printMatrix(M:np.array, sep:str):
                 line +=(sep)
         print(line)
 
-def correct_negative_values(M:np.array):
+def correct_negative_values_matrix(M:np.array):
     nRows = len(M)
     for i in range(nRows):
         m = len(M[i])
@@ -407,4 +407,8 @@ def correct_negative_values(M:np.array):
             if M[i][j] < 0:
                 M[i][j] = 0
 
-
+def correct_negative_values_list(x: list[float]):
+    n = len(x)
+    for i in range(n):
+        if x[i] < 0:
+            x[i] = 0

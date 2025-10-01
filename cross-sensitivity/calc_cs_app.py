@@ -107,7 +107,7 @@ measurements_file = None
 output_file_name = None
 output_file_separator = " "
 column_indices = []
-max_number_of_measurements = None
+max_number_of_measurements = 100000000000000
 flag_old_version = False
 polarity_reverse = False
 polarity_sign = +1.0
@@ -227,7 +227,7 @@ if flag_verbose:
 
 #Perform caclulations for measurements data from file
 if measurements_file != None:
-    #example indices for raw data: -d 3,9,14,16,17,19,21,22
+    #example indices for raw data: -d 3,23,25,27,28,30,32,33
     id_index = -1
     T_index = -1
     V_indices = []
@@ -308,6 +308,9 @@ if measurements_file != None:
         else:      
             b = calc_b(id, voltages, T,  cscd)
 
+        if flag_negative_correction:
+            correct_negative_values_list(b)
+
         output_s = "0  "       
         for i in range(n):
             output_s += str(b[i]) + " "
@@ -323,7 +326,7 @@ if measurements_file != None:
             C = calc_concentrations(id,voltages, T,  cscd)
 
         if flag_negative_correction:
-            correct_negative_values(C)
+            correct_negative_values_matrix(C)
         
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):
@@ -387,7 +390,11 @@ if num_of_errors == 0:
         if flag_old_version:
             b = calc_b_00(id,voltages, T,  cscd)
         else:
-            b = calc_b(id,voltages, T,  cscd)    
+            b = calc_b(id,voltages, T,  cscd) 
+
+        if flag_negative_correction:
+            correct_negative_values_list(b)
+
         output_s = "0  "
         for i in range(n):
             output_s += str(b[i]) + " "
@@ -399,7 +406,8 @@ if num_of_errors == 0:
             C = calc_concentrations(id,voltages, T,  cscd)
 
         if flag_negative_correction:
-            correct_negative_values(C)
+            correct_negative_values_matrix(C)
+
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):
             output_s += str(C[i,0]) + " "
