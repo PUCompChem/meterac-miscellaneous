@@ -20,7 +20,7 @@ calc_work_matrix(cscd)
 print("A:\n" + str(cscd.A))
 
 #calc_inv_work_matrix(cscd)
-get_inv_work_matrix(cscd)
+get_inv_work_matrix(cscd)   #if present the matrix is taken from cs_settings file
 
 print("invA:")
 printMatrix(cscd.invA, ", ")
