@@ -166,7 +166,7 @@ def parse_properties(props: dict) -> CSCalcData:
                            errors.append("Incorrect float token in '" + pname + "': " + t)                        
                         values.append(v)
                 cscd.cs.append(values)
-
+        
         #Parse invA precalculated matrix (properties invA_1, invA_2,...)
         if props.get("invA_1") != None:
             cscd.invAPrecalc = []
@@ -260,20 +260,19 @@ def parse_properties(props: dict) -> CSCalcData:
 def calc_work_matrix(cscd: CSCalcData):
     '''
     Calculatin of a work matrix for solving a system of equations for { Ci | i = 1..n }
-        Ci = Vi/(ICSi .TCSi(T).Ri)  - ZSi(T)/TCSi(T) + Summa(CSij.Cj | for all j != i)
+        Ci = Vi/(ICSi .TCSi(T).Ri)  - ZSi(T)/TCSi(T) - Summa(CSij.Cj | for all j != i)
         
     denote:
         bi = Vi/(ICSi .TCSi(T).Ri)  - ZSi(T)/TCSi(T) 
 
     then the system is reformulated: 
-        Ci = bi + Summa(CSij.Cj)
+        Ci = bi - Summa(CSij.Cj)
 
     and finaly: 
-        1.0*Ci - Summa(CSij.Cj) = bi  
+        1.0*Ci + Summa(CSij.Cj) = bi  
 
     Hence:
-        the working matrix, A, is the CS (cross sensitivity) matrix 
-        with reverse sign of the non diagonal elements
+        the working matrix, A, is exactly the CS (cross sensitivity) matrix       
         In the CS matrix, the diagonal elements must be equal to 1
 
     ----------------------------------------------------
@@ -282,21 +281,27 @@ def calc_work_matrix(cscd: CSCalcData):
         bi = Vi/(ICSi .TCSi(T).Ri)  + ZSi(T)
         The major error was the sign infront of ZSi(T) --> Zero shift must be substracted not added
         Also according the CPEC sensors application notes,
-        Temperature Coefficient of Span correction is applied after zero shift (base line) correction  
+        Temperature Coefficient of Span correction is applied after zero shift (base line) correction
+    
+        the working matrix, A, is the CS (cross sensitivity) matrix
+        with reverse sign of the non diagonal elements
+        In the CS matrix, the diagonal elements must be equal to 1
     '''
 
     n = cscd.num_of_sensors
     A = np.array(cscd.cs)    
+    '''
+    # reversing of sign is not applied
     for i in range(n):
         for j in range(n):
             if i!=j:
                 A[i][j] = -A[i][j]
-    cscd.A = A
-
+    '''
+    cscd.A = A    
 
 def calc_inv_work_matrix(cscd: CSCalcData):
     invA = np.linalg.inv(cscd.A)
-    cscd.invA = invA    
+    cscd.invA = invA
 
 def get_inv_work_matrix(cscd: CSCalcData):
     if cscd.invAPrecalc == None:
@@ -358,7 +363,7 @@ def calc_concentrations(device: str, voltages: list[float], temperature:float, c
     invA = np.array(get_inv_work_matrix(cscd))
     c = np.matmul(invA,b_matrix)
     return c
-
+ 
 # old function version
 def calc_b_00(device: str, voltages: list[float], temperature:float, cscd: CSCalcData) -> list[float]:
     # old wrong formula bi = Vi/ICSi .TCSi(T).Ri  + ZSi(T)
