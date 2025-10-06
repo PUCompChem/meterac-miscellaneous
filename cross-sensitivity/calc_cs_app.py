@@ -90,7 +90,7 @@ def print_help(options: list[CLIOption]):
 options = [CLIOption("i","ics-data", True), 
            CLIOption("c","cs-settings", True),
            CLIOption("u","uncorrected", False),
-           CLIOption("v","verbose", False),
+           CLIOption("b","baseline-correction", True),
            CLIOption("n","negative-correction", True),
            CLIOption("f","measurements-file", True),
            CLIOption("o","output-file", True),
@@ -98,11 +98,13 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("x","max-number-of-measurements", True),
            CLIOption("r","old-version", False),
            CLIOption("p","polarity-reverse", False),
+           CLIOption("v","verbose", False),
            CLIOption("h","help", False)]
 
 ics_data_file = "./data/ics_data01.txt"        #default value
 cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
+flag_baseline_correction = True                #default value
 measurements_file = None
 output_file_name = None
 output_file_separator = " "
@@ -160,6 +162,21 @@ if "negative-correction" in arguments["standard_options"].keys():
         errors_out.append("Option -n (--negative-correction) has no argument!")
         num_of_errors += 1
 
+#Get baseline-correction option
+if "baseline-correction" in arguments["standard_options"].keys():
+    bl_corr = arguments["standard_options"]["baseline-correction"]
+    if bl_corr != None:
+        if bl_corr.lower() == "on" or bl_corr.lower() == "true":
+            flag_baseline_correction = True
+        elif bl_corr.lower() == "off" or bl_corr.lower() == "false":
+            flag_baseline_correction = False
+        else:
+            errors_out.append("Incorrect argument for Option -b (--baseline-correction): " + bl_corr)
+            num_of_errors += 1
+    else:
+        errors_out.append("Option -b (--baseline-correction) has no argument!")
+        num_of_errors += 1
+
 #Get measurements file
 if "measurements-file" in arguments["standard_options"].keys():
     measurements_file = arguments["standard_options"]["measurements-file"]
@@ -203,10 +220,13 @@ if "output-file" in arguments["standard_options"].keys():
            output_file_separator = "\t"
 
 if flag_verbose:
+    if flag_old_version:
+        print("Working with old version")
     print("ics data is loaded from file: " + ics_data_file)
     print("cs settings are loaded from file: " + cs_setting_file)
-    print("Negative value correction = " + str(flag_negative_correction))
-   
+    print("Negative values correction = " + str(flag_negative_correction))
+    print("Baseline correction = " + str(flag_baseline_correction))    
+    print("Polarity reverse = ", polarity_reverse)
 
 #Load basic settings for calculation
 if flag_verbose:
