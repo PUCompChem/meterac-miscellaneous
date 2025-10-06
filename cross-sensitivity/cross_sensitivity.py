@@ -358,6 +358,8 @@ def calc_ZS(sensor_num: int, temperature:float, cscd: CSCalcData) -> float:
 
 def get_ICS(device: str, sensor_num: int, cscd: CSCalcData) -> float:
     ics_values = cscd.ICSs.get(device)
+    if ics_values  == None:
+        print("ICSs data for deviece " + device + " is not avalable. Check ics_data file")
     return ics_values[sensor_num]
 
 def calc_b(device: str, voltages: list[float], temperature:float, cscd: CSCalcData) -> list[float]:
@@ -435,3 +437,14 @@ def correct_negative_values_list(x: list[float]):
     for i in range(n):
         if x[i] < 0:
             x[i] = 0
+
+def voltage_baseline_correction(device: str, voltages: list[float], cscd: CSCalcData, polarity_sign: float = 1.0):
+    n = len(voltages)
+    iblc_values = cscd.IBLCs.get(device)
+    if iblc_values  == None:
+        print("IBLCs data for deviece " + device + " is not avalable. Check ics_data file")
+        print("Calculations are performed without base line correction")
+        return voltages
+    else:
+        for i in range(n):
+            voltages[i] = voltages[i] - polarity_sign * iblc_values[i]

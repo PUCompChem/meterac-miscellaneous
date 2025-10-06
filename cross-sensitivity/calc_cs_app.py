@@ -104,7 +104,7 @@ options = [CLIOption("i","ics-data", True),
 ics_data_file = "./data/ics_data01.txt"        #default value
 cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
-flag_baseline_correction = True                #default value
+flag_baseline_correction = False               #default value
 measurements_file = None
 output_file_name = None
 output_file_separator = " "
@@ -322,6 +322,9 @@ if measurements_file != None:
             for i in range(n):
                 output_s_f += str(voltages[i]) + output_file_separator
         
+        if flag_baseline_correction:
+            voltage_baseline_correction(id, voltages, cscd, polarity_sign)
+
         #print("Calculating non corrected concentrations:")
         if flag_old_version:
             b = calc_b_00(id, voltages, T,  cscd)   
@@ -405,6 +408,9 @@ if id != None:
 if flag_verbose:
     print("Calculation result:")
 if num_of_errors == 0:
+    if flag_baseline_correction:
+        voltage_baseline_correction(id, voltages, cscd, polarity_sign)
+
     if flag_uncorrected:
         #print("Calculating non corrected concetrations:")
         if flag_old_version:
