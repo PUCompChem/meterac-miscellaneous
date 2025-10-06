@@ -11,6 +11,7 @@ class CSCalcData:
         self.TCSCoeffs = None       #list of lists Temperature Coefficient of Span (interpolated as a polynomial)
         self.ZSCoeffs = None        #list of lists Zero Shift (interpolated as a polynomial)
         self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of devices/nodes)
+        self.IBLCs = None           #dictinary of lists of float values (Individual base line corrections for a set of devices/nodes)
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.invAPrecalc = None     #numpy array with the inverse wotking matrix loaded from file
@@ -41,13 +42,26 @@ def load_ics_values(filepath: str, cscd: CSCalcData):
     ...    
     '''
     ICSs = {}
+    IBLCs = {}
+
     errors = []
     n = cscd.num_of_sensors
     lineNum = 0
+    flagLoading = 1 # 1 - ICS, 2 - BLC (base line correction)
+
     with open(filepath, "rt") as f:
         for line in f:
             l = line.strip()
             lineNum += 1
+
+            if l.startswith("#ICSs"):
+                flagLoading = 1
+                continue
+            
+            if l.startswith("#IBLCs"):
+                flagLoading = 2
+                continue
+
             if l != '' and not l.startswith("#"):
                 tokens = l.split(",")
                 if len(tokens) != n+1:
@@ -83,16 +97,20 @@ def load_ics_values(filepath: str, cscd: CSCalcData):
                                 errors.append("On line " + str(lineNum) + ": Incorrect float token #"
                                           + str (i+1) + " --> " + t)
                         values.append(v)
-                    ICSs[key] = values
+                    if flagLoading == 1:
+                        ICSs[key] = values
+                    if flagLoading == 2:
+                        IBLCs[key] = values    
 
     #Handle line reading and parsing errors as an excpetion
     if len(errors) > 0:
-        errorMsg = "There are errors on reading and parsing ICS values from file: " + filepath + "\n"
+        errorMsg = "There are errors on reading and parsing ICS/BLC values from file: " + filepath + "\n"
         for err in errors:
             errorMsg += "  " + err + "\n"
         raise Exception(errorMsg)
     else:
        cscd.ICSs = ICSs
+       cscd.IBLCs = IBLCs
 
 def parse_properties(props: dict) -> CSCalcData:
     cscd = CSCalcData()
