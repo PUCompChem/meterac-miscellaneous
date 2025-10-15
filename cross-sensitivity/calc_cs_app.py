@@ -96,10 +96,20 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("o","output-file", True),
            CLIOption("d","column-indices", True),
            CLIOption("x","max-number-of-measurements", True),
+           CLIOption("t","time-stamp-interval", True),
            CLIOption("r","old-version", False),
            CLIOption("p","polarity-reverse", False),
            CLIOption("v","verbose", False),
            CLIOption("h","help", False)]
+
+def check_time_stamp(t: int)-> bool:
+    if time_stamp_begin != -1:
+        if t < time_stamp_begin:
+            return False
+    if time_stamp_end != -1:
+        if t > time_stamp_end:
+            return False
+    return True
 
 ics_data_file = "./data/ics_data01.txt"        #default value
 cs_setting_file = "./data/cs_settings01.txt"   #default value
@@ -113,6 +123,10 @@ max_number_of_measurements = 100000000000000
 flag_old_version = False
 polarity_reverse = False
 polarity_sign = +1.0
+flag_time_stamp_interval = False               #default value
+time_stamp_begin = -1
+time_stamp_end = -1
+
 
 #Handle CLI input arguments
 # ID T V1 V2 ...Vn -i <ics-file> -c <cs-file> -u -v
@@ -219,6 +233,32 @@ if "output-file" in arguments["standard_options"].keys():
         if output_file_name.lower().endswith((".tsv", ".txt")):
            output_file_separator = "\t"
 
+#Get time stamp interval:
+#Supported formats: t1-t2,  t1, t1-, -t2
+if "time-stamp-interval" in arguments["standard_options"].keys():
+    t_arg = arguments["standard_options"]["time-stamp-interval"]
+    if t_arg == None:
+        errors_out.append("Option -t (--time-stamp-interval) has no argument!")
+        num_of_errors += 1
+    else:
+        t_tokens = t_arg.split("-")
+        try:
+            if t_tokens[0] != "":
+                time_stamp_begin = int(t_tokens[0])
+            if len(t_tokens) == 2:
+                if t_tokens[1] != "":
+                    time_stamp_end = int(t_tokens[1])
+            else:
+                if len(t_tokens) > 2:
+                    raise("Incorrect time stamp interval format")
+            #print ("t interval:",time_stamp_begin, time_stamp_end)
+            if time_stamp_begin == -1 and time_stamp_end == -1:
+                raise("Incorrect time stamp interval format")
+        except Exception as e:
+            errors_out.append("Incorrect -t (--time-stamp-interval) option " + t_arg)
+            num_of_errors += 1
+        flag_time_stamp_interval = True
+
 if flag_verbose:
     if flag_old_version:
         print("Working with old version")
@@ -255,7 +295,7 @@ if measurements_file != None:
 
     if len(column_indices) != n+3:
         errors_out.append("Incorrect number of column indices (option -d)")
-        errors_out.append("Expected indices for: ID T V1 V2 ... Vn time")       
+        errors_out.append("Expected indices for: ID T V1 V2 ... Vn utctime")
         num_of_errors += 1
     else:
         #for all indices: 1-base --> 0-base transforms is done
@@ -307,6 +347,11 @@ if measurements_file != None:
         id = line[id_index]
         T = float(line[T_index])
         time_str = line[time_index]
+        t_stamp = int(time_str)
+
+        if not check_time_stamp(t_stamp):
+            continue
+
         voltages = []
 
         for i in range(n):            
