@@ -336,9 +336,9 @@ if measurements_file != None:
 
         output_s = "0  "       
         for i in range(n):
-            output_s += str(b[i]) + " "
+            output_s += format(b[i],".2f") + " "
             if output_file_name != None:
-                output_s_f += str(b[i]) + output_file_separator
+                output_s_f += format(b[i],".2f") + output_file_separator
         
         if flag_verbose:
             print(output_s)
@@ -353,9 +353,9 @@ if measurements_file != None:
         
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):
-            output_s += str(C[i,0]) + " "
+            output_s += format(C[i,0],".2f") + " "
             if output_file_name != None:
-                output_s_f += str(C[i,0]) + output_file_separator
+                output_s_f += format(C[i,0],".2f") + output_file_separator
         
         output_s_f += time_str
 
@@ -423,7 +423,7 @@ if num_of_errors == 0:
 
         output_s = "0  "
         for i in range(n):
-            output_s += str(b[i]) + " "
+            output_s += format(b[i],".2f") + " "
         print(output_s)
     else:
         if flag_old_version:
@@ -436,7 +436,7 @@ if num_of_errors == 0:
 
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):
-            output_s += str(C[i,0]) + " "
+            output_s += format(C[i,0],".2f") + " "
         print(output_s)
 else:
     print(str(num_of_errors) + #First output token a aproblem flag (number of errors)
