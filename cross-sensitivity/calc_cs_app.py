@@ -6,6 +6,7 @@ import sys
 sys.path.append("./")
 from cross_sensitivity import *
 from ioutils import *
+from datetime import datetime
 
 errors_out = []
 
@@ -295,7 +296,7 @@ if measurements_file != None:
 
     if len(column_indices) != n+3:
         errors_out.append("Incorrect number of column indices (option -d)")
-        errors_out.append("Expected indices for: ID T V1 V2 ... Vn utctime")
+        errors_out.append("Expected indices for: ID T datetime V1 V2 ... Vn utctime")
         num_of_errors += 1
     else:
         #for all indices: 1-base --> 0-base transforms is done
@@ -321,7 +322,7 @@ if measurements_file != None:
         try:
             out_file = open(output_file_name, "w", encoding="utf-8")
             #write header line
-            header_line = "id" + output_file_separator + "T" + output_file_separator
+            header_line = "id" + output_file_separator + "T" + output_file_separator + "date_time" + output_file_separator 
             for i in range(n):
                 header_line += "v_" + str(i+1) + output_file_separator
             for i in range(n):
@@ -348,22 +349,26 @@ if measurements_file != None:
         T = float(line[T_index])
         time_str = line[time_index]
         t_stamp = int(time_str)
-
+        
         if not check_time_stamp(t_stamp):
             continue
 
+        dt = datetime.fromtimestamp(t_stamp)
+        #dt_str = str(dt.date()) + " " + str(dt.time())
         voltages = []
 
         for i in range(n):            
             voltages.append(polarity_sign * float(line[V_indices[i]]))
         if flag_verbose:    
-            print("id = ", id, "T=", T, "V1=", voltages[0], "V2=", voltages[1], 
+            print("id = ", id, "T=", T, "datetime=", str(dt), "V1=", voltages[0], "V2=", voltages[1], 
                 "V3=", voltages[2], "V4=", voltages[3], "V5=", voltages[4], "Time= ", time_str)
         
         output_s_f = ""
         if output_file_name != None:
             output_s_f += id + output_file_separator
             output_s_f += str(T) + output_file_separator
+            output_s_f += str(dt) + output_file_separator
+
             for i in range(n):
                 output_s_f += str(voltages[i]) + output_file_separator
         
