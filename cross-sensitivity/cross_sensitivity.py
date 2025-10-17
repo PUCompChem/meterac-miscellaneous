@@ -8,6 +8,7 @@ class CSCalcData:
         self.sensors = None         #list of names (designations)
         self.cs = None              #list of lists (cross sensitivity matrix)
         self.R = None               #list of float values (resistences in KOms)
+        self.MolMass = None         #list of float values (Molar masses of the gasses in g/mol)
         self.TCSCoeffs = None       #list of lists Temperature Coefficient of Span (interpolated as a polynomial)
         self.ZSCoeffs = None        #list of lists Zero Shift (interpolated as a polynomial)
         self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of devices/nodes)
