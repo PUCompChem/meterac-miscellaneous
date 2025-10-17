@@ -27,6 +27,13 @@ R_3 = 50000
 R_4 = 500000
 R_5 = 500000
 
+#Gas molar mass in g/mol
+mm_1 = 28.01
+mm_2 = 64.066
+mm_3 = 34.082
+mm_4 = 48
+mm_5 = 46.0055
+
 #Temperature Coefficient of Span (interpolated as a polynomial)
 TCS_1 = 0.8762, 0.0073, -7E-05
 TCS_2 = 0.7897, 0.0107, -7E-05
