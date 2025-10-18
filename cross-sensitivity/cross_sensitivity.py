@@ -226,6 +226,21 @@ def parse_properties(props: dict) -> CSCalcData:
                     errors.append("Incorrect float '" + pname + "': " + p)
                 cscd.R.append(v)
 
+        #Parse molar masses
+        cscd.MolMass = []
+        for i in range(n):
+            pname = "mm_" + str(i+1)
+            p = props.get(pname)
+            if (p == None):
+                errors.append("Property '" + pname + "' is missing")
+            else:
+                v = None
+                try:
+                    v = float(p)
+                except Exception as e:
+                    errors.append("Incorrect float '" + pname + "': " + p)
+                cscd.MolMass.append(v)        
+
         #Parse TCS polynomial coefficients
         cscd.TCSCoeffs = []
         for i in range(n):
