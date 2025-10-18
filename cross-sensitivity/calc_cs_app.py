@@ -100,6 +100,7 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("t","time-stamp-interval", True),
            CLIOption("r","old-version", False),
            CLIOption("p","polarity-reverse", False),
+           CLIOption("m","mass-output", False),
            CLIOption("v","verbose", False),
            CLIOption("h","help", False)]
 
@@ -116,6 +117,7 @@ ics_data_file = "./data/ics_data01.txt"        #default value
 cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
 flag_baseline_correction = False               #default value
+flag_mass_output = False                       #default value
 measurements_file = None
 output_file_name = None
 output_file_separator = " "
@@ -141,6 +143,8 @@ flag_uncorrected = "uncorrected" in arguments["boolean_options"]
 flag_verbose = "verbose" in arguments["boolean_options"]
 flag_old_version = "old-version" in arguments["boolean_options"]
 polarity_reverse = "polarity-reverse" in arguments["boolean_options"]
+flag_mass_output = "mass-output" in arguments["boolean_options"]
+
 if polarity_reverse:
     polarity_sign = -1.0
 
@@ -268,6 +272,10 @@ if flag_verbose:
     print("Negative values correction = " + str(flag_negative_correction))
     print("Baseline correction = " + str(flag_baseline_correction))    
     print("Polarity reverse = ", polarity_reverse)
+    if flag_mass_output:
+        print("Output unit: mg/m3")
+    else:
+        print("Output unit: ppm")
 
 #Load basic settings for calculation
 if flag_verbose:
