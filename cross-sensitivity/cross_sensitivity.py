@@ -464,3 +464,12 @@ def voltage_baseline_correction(device: str, voltages: list[float], cscd: CSCalc
     else:
         for i in range(n):
             voltages[i] = voltages[i] - polarity_sign * iblc_values[i]
+
+def ppm_to_mass_concentration(sensor_num: int, c_ppm: float, T: float, cscd: CSCalcData) -> float:
+    ''' 
+    T is temperature in deg Celsius
+    0.0224139695450141 [m3/mol] is the molar volume of ideal gas at 1 atm, T = 0
+    mg/m3 = ppm*(M/22.41397)*(273.15/(273.15 + T))
+    '''
+    M = cscd.MolMass[sensor_num]
+    return c_ppm * (M/22.4139695450141) * (273.15/(273.15 + T))
