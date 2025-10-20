@@ -12,10 +12,11 @@ import random
 errors_out = []
 
 class CLIOption:
-    def __init__(self, shortName: str, longName: str, requiresArgument : bool):
+    def __init__(self, shortName: str, longName: str, requiresArgument: bool, info: str = ""):
         self.shortName = shortName
         self.longName = longName
         self.requiresArgument = requiresArgument
+        self.info = info
 
     def checkOption(self, arg: str) -> bool:
         #Checking whether the argument is an CLI option:
@@ -85,26 +86,28 @@ def print_help(options: list[CLIOption]):
     print("   ./data/cs_settings01.txt")
     print("Full list of options:")
     for opt in options:
-        print("-"+opt.shortName + "  --" + opt.longName)
+        print("-"+opt.shortName + "  --" + opt.longName + "    " + opt.info)
 
 
 #Setting CLI options and default file names0
-options = [CLIOption("i","ics-data", True), 
-           CLIOption("c","cs-settings", True),
-           CLIOption("u","uncorrected", False),
-           CLIOption("b","baseline-correction", True),
-           CLIOption("n","negative-correction", True),
-           CLIOption("f","measurements-file", True),
-           CLIOption("o","output-file", True),
-           CLIOption("d","column-indices", True),
-           CLIOption("x","max-number-of-measurements", True),
-           CLIOption("t","time-stamp-interval", True),
-           CLIOption("r","old-version", False),
-           CLIOption("p","polarity-reverse", False),
-           CLIOption("m","mass-output", False),
-           CLIOption("z","add-random-noise", False),
-           CLIOption("v","verbose", False),
-           CLIOption("h","help", False)]
+options = [CLIOption("i","ics-data", True, "Sets ics-data file name."), 
+           CLIOption("c","cs-settings", True, "Sets cs-settings file name."),
+           CLIOption("u","uncorrected", False, "Outputs uncorrected values not taking into account cross sensitivity."),
+           CLIOption("b","baseline-correction", True, "on/off value expected. " +
+                "Performs base line correction on the base of empirical data. Default value 'off'"),
+           CLIOption("n","negative-correction", True, "on/off value expected. " +
+                "Negative concetrations are set to zero. Default value 'on'"),
+           CLIOption("f","measurements-file", True, "Input file with raw measurements."),
+           CLIOption("o","output-file", True, "Output file used for the resutls from batch processing of measurements file."),
+           CLIOption("d","column-indices", True, "Column indices specifying id, T, datatime, V1,V2,... locations within measurements file."),
+           CLIOption("x","max-number-of-measurements", True, "The maximal number of measurements file lines to be processed"),
+           CLIOption("t","time-stamp-interval", True, "Interval of UTC time stamps for filtering the measurements file."),
+           CLIOption("r","old-version", False, "Used for testing purposes only."),
+           CLIOption("p","polarity-reverse", False, "The signs of input voltages are reversed."),
+           CLIOption("m","mass-output", False, "The output results are reported in mg/m3 instead of ppm."),
+           CLIOption("z","add-random-noise", False, "Adding random noise to the final calculated concetrations."),
+           CLIOption("v","verbose", False, "More detailed info is output to the console."),
+           CLIOption("h","help", False, "Prints this help.")]
 
 def check_time_stamp(t: int)-> bool:
     if time_stamp_begin != -1:
