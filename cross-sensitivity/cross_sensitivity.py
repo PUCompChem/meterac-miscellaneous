@@ -455,6 +455,7 @@ def correct_negative_values_list(x: list[float]):
         if x[i] < 0:
             x[i] = 0
 
+'''
 def voltage_baseline_correction(device: str, voltages: list[float], cscd: CSCalcData, polarity_sign: float = 1.0):
     n = len(voltages)
     iblc_values = None
@@ -466,18 +467,19 @@ def voltage_baseline_correction(device: str, voltages: list[float], cscd: CSCalc
         return voltages
     else:
         for i in range(n):
-            voltages[i] = voltages[i] - polarity_sign * iblc_values[i]
+            voltages[i] = voltages[i] + polarity_sign * iblc_values[i]
+'''
 
-def ppm_baseline_correction(device: str, sensor_num: int, c: float, cscd: CSCalcData):
+def ppm_baseline_correction(device: str, sensor_num: int, c: float, cscd: CSCalcData) -> float:
     iblc_values = None
     if cscd.PPMIBLCs != None:
         iblc_values = cscd.PPMIBLCs.get(device)
     if iblc_values  == None:
         print("PPMIBLCs data for deviece " + device + " is not avalable. Check ics_data file")
         print("Calculations are performed without base line correction")
-        return
+        return c
     else:
-        c = c - iblc_values[sensor_num]
+        return c + iblc_values[sensor_num]
 
 def ppm_to_mass_concentration(sensor_num: int, c_ppm: float, T: float, cscd: CSCalcData) -> float:
     ''' 

@@ -380,8 +380,8 @@ if measurements_file != None:
             for i in range(n):
                 output_s_f += str(voltages[i]) + output_file_separator
         
-        if flag_baseline_correction:
-            voltage_baseline_correction(id, voltages, cscd, polarity_sign)
+        #if flag_baseline_correction:
+        #    voltage_baseline_correction(id, voltages, cscd, polarity_sign)
 
         #print("Calculating non corrected concentrations:")
         if flag_old_version:
@@ -466,15 +466,21 @@ if id != None:
 if flag_verbose:
     print("Calculation result:")
 if num_of_errors == 0:
-    if flag_baseline_correction:
+    '''
+    Voltage base line correction is not applied
+    #if flag_baseline_correction:
         voltage_baseline_correction(id, voltages, cscd, polarity_sign)
-
+    '''
     if flag_uncorrected:
         #print("Calculating non corrected concetrations:")
         if flag_old_version:
             b = calc_b_00(id,voltages, T,  cscd)
         else:
-            b = calc_b(id,voltages, T,  cscd) 
+            b = calc_b(id,voltages, T,  cscd)
+
+        if flag_baseline_correction:
+            for i in range(n):
+                b[i] = ppm_baseline_correction(id, i, b[i], cscd)
 
         if flag_negative_correction:
             correct_negative_values_list(b)
@@ -491,6 +497,10 @@ if num_of_errors == 0:
             C = calc_concentrations_00(id,voltages, T,  cscd)
         else:
             C = calc_concentrations(id,voltages, T,  cscd)
+
+        if flag_baseline_correction:
+            for i in range(n):
+                C[i,0] = ppm_baseline_correction(id, i, C[i,0], cscd)
 
         if flag_negative_correction:
             correct_negative_values_matrix(C)
