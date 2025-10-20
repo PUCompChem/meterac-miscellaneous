@@ -7,6 +7,7 @@ sys.path.append("./")
 from cross_sensitivity import *
 from ioutils import *
 from datetime import datetime
+import random
 
 errors_out = []
 
@@ -101,6 +102,7 @@ options = [CLIOption("i","ics-data", True),
            CLIOption("r","old-version", False),
            CLIOption("p","polarity-reverse", False),
            CLIOption("m","mass-output", False),
+           CLIOption("z","add-random-noise", False),
            CLIOption("v","verbose", False),
            CLIOption("h","help", False)]
 
@@ -118,6 +120,7 @@ cs_setting_file = "./data/cs_settings01.txt"   #default value
 flag_negative_correction = True                #default value
 flag_baseline_correction = False               #default value
 flag_mass_output = False                       #default value
+flag_add_random_noise = False                  #default value
 measurements_file = None
 output_file_name = None
 output_file_separator = " "
@@ -144,6 +147,7 @@ flag_verbose = "verbose" in arguments["boolean_options"]
 flag_old_version = "old-version" in arguments["boolean_options"]
 polarity_reverse = "polarity-reverse" in arguments["boolean_options"]
 flag_mass_output = "mass-output" in arguments["boolean_options"]
+flag_add_random_noise = "add-random-noise" in arguments["boolean_options"]
 
 if polarity_reverse:
     polarity_sign = -1.0
@@ -270,7 +274,7 @@ if flag_verbose:
     print("ics data is loaded from file: " + ics_data_file)
     print("cs settings are loaded from file: " + cs_setting_file)
     print("Negative values correction = " + str(flag_negative_correction))
-    print("Baseline correction = " + str(flag_baseline_correction))    
+    print("Baseline correction = " + str(flag_baseline_correction))       
     print("Polarity reverse = ", polarity_reverse)
     if flag_mass_output:
         print("Output unit: mg/m3")
@@ -293,6 +297,8 @@ if flag_verbose:
     print("cs.ics_unit_scaling = ", cscd.ics_unit_scaling)
     if polarity_reverse:
         print("Input voltages sign is changed (polarity_reverse = True)")
+    if flag_add_random_noise:
+        print("Adding random noise with level: " + str(cscd.random_noise_level) + " ppm")
 
 #Perform caclulations for measurements data from file
 if measurements_file != None:
@@ -495,6 +501,10 @@ if num_of_errors == 0:
         if flag_negative_correction:
             correct_negative_values_list(b)
 
+        if flag_add_random_noise:
+            for i in range(n):
+                b[i] += random.uniform(0.0000001, cscd.random_noise_level)
+
         output_s = "0  "
         for i in range(n):
             if flag_mass_output:
@@ -514,6 +524,10 @@ if num_of_errors == 0:
 
         if flag_negative_correction:
             correct_negative_values_matrix(C)
+
+        if flag_add_random_noise:
+            for i in range(n):
+                C[i,0] += random.uniform(0.0000001, cscd.random_noise_level)
 
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):

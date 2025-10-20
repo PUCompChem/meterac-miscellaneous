@@ -5,6 +5,7 @@ class CSCalcData:
         self.num_of_sensors = None
         self.signal_scaling = None
         self.ics_unit_scaling = None
+        self.random_noise_level = 0.1  #Random noise level in ppm
         self.sensors = None         #list of names (designations)
         self.cs = None              #list of lists (cross sensitivity matrix)
         self.R = None               #list of float values (resistences in KOms)
@@ -17,7 +18,7 @@ class CSCalcData:
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.invAPrecalc = None     #numpy array with the inverse wotking matrix loaded from file
-
+       
 
 
 def load_properties(filepath: str):
@@ -149,7 +150,16 @@ def parse_properties(props: dict) -> CSCalcData:
         else:
             cscd.ics_unit_scaling = us
     else:    
-        errors.append("Property 'ics_unit_scaling' is missing")    
+        errors.append("Property 'ics_unit_scaling' is missing")
+
+    random_noise_level_prop = props.get("random_noise_level")
+    if (random_noise_level_prop!= None):
+        try:
+            rnl = float(random_noise_level_prop)
+        except Exception as e:
+            errors.append("random_noise_level is not correct float: " + random_noise_level_prop)
+        else:
+            cscd.random_noise_level = rnl
 
     n = cscd.num_of_sensors
     if (n != None):
