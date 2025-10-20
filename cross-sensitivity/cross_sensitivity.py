@@ -12,7 +12,8 @@ class CSCalcData:
         self.TCSCoeffs = None       #list of lists Temperature Coefficient of Span (interpolated as a polynomial)
         self.ZSCoeffs = None        #list of lists Zero Shift (interpolated as a polynomial)
         self.ICSs = None            #dictinary of lists of float values (Individual Codes of Sensitivity for a set of devices/nodes)
-        self.IBLCs = None           #dictinary of lists of float values (Individual base line corrections for a set of devices/nodes)
+        self.VoltageIBLCs = None    #dictinary of lists of float values (Individual base line corrections for a set of devices/nodes)
+        self.PPMIBLCs = None        #dictinary of lists of float values (Individual base line corrections for a set of devices/nodes)
         self.A = None               #numpy array with the working matrix
         self.invA = None            #numpy array with the inverse wotking matrix
         self.invAPrecalc = None     #numpy array with the inverse wotking matrix loaded from file
@@ -43,12 +44,12 @@ def load_ics_values(filepath: str, cscd: CSCalcData):
     ...    
     '''
     ICSs = {}
-    IBLCs = {}
+    PPMIBLCs = {}
 
     errors = []
     n = cscd.num_of_sensors
     lineNum = 0
-    flagLoading = 1 # 1 - ICS, 2 - BLC (base line correction)
+    flagLoading = 1 # 1 - ICS, 2 - PPMBLC (base line correction)
 
     with open(filepath, "rt") as f:
         for line in f:
@@ -59,7 +60,7 @@ def load_ics_values(filepath: str, cscd: CSCalcData):
                 flagLoading = 1
                 continue
             
-            if l.startswith("#IBLCs"):
+            if l.startswith("#PPMIBLCs"):
                 flagLoading = 2
                 continue
 
@@ -101,7 +102,7 @@ def load_ics_values(filepath: str, cscd: CSCalcData):
                     if flagLoading == 1:
                         ICSs[key] = values
                     if flagLoading == 2:
-                        IBLCs[key] = values    
+                        PPMIBLCs[key] = values    
 
     #Handle line reading and parsing errors as an excpetion
     if len(errors) > 0:
@@ -111,7 +112,7 @@ def load_ics_values(filepath: str, cscd: CSCalcData):
         raise Exception(errorMsg)
     else:
        cscd.ICSs = ICSs
-       cscd.IBLCs = IBLCs
+       cscd.PPMIBLCs = PPMIBLCs
 
 def parse_properties(props: dict) -> CSCalcData:
     cscd = CSCalcData()
@@ -456,14 +457,27 @@ def correct_negative_values_list(x: list[float]):
 
 def voltage_baseline_correction(device: str, voltages: list[float], cscd: CSCalcData, polarity_sign: float = 1.0):
     n = len(voltages)
-    iblc_values = cscd.IBLCs.get(device)
+    iblc_values = None
+    if cscd.VoltageIBLCs != None:
+        iblc_values = cscd.VoltageIBLCs.get(device)
     if iblc_values  == None:
-        print("IBLCs data for deviece " + device + " is not avalable. Check ics_data file")
+        print("VoltageIBLCs data for deviece " + device + " is not avalable. Check ics_data file")
         print("Calculations are performed without base line correction")
         return voltages
     else:
         for i in range(n):
             voltages[i] = voltages[i] - polarity_sign * iblc_values[i]
+
+def ppm_baseline_correction(device: str, sensor_num: int, c: float, cscd: CSCalcData):
+    iblc_values = None
+    if cscd.PPMIBLCs != None:
+        iblc_values = cscd.PPMIBLCs.get(device)
+    if iblc_values  == None:
+        print("PPMIBLCs data for deviece " + device + " is not avalable. Check ics_data file")
+        print("Calculations are performed without base line correction")
+        return
+    else:
+        c = c - iblc_values[sensor_num]
 
 def ppm_to_mass_concentration(sensor_num: int, c_ppm: float, T: float, cscd: CSCalcData) -> float:
     ''' 

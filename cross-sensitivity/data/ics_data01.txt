@@ -16,7 +16,7 @@ H93, 4.08, 40.81, 155.00, -44.15, -29.13
 H94, 3.60, 33.48, 151.44, -45.69, -27.98
 
 
-#IBLCs values as raw sensor volatge output (base line corrections)
+#PPMIBLCs values as raw sensor volatge output (base line corrections)
 H40, 0, 0, 0, 0, 0
 H41, 0, 0, 0, 0, 0
 H83, 0, 0, 0, 0, 0
