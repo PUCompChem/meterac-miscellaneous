@@ -481,7 +481,10 @@ if num_of_errors == 0:
 
         output_s = "0  "
         for i in range(n):
-            output_s += format(b[i],".2f") + " "
+            if flag_mass_output:
+                output_s += format(ppm_to_mass_concentration(i,b[i],T,cscd),".2f") + " "
+            else:
+                output_s += format(b[i],".2f") + " "
         print(output_s)
     else:
         if flag_old_version:
@@ -494,7 +497,11 @@ if num_of_errors == 0:
 
         output_s = "0  "  #First output token is the OK flag (no errors)
         for i in range(n):
-            output_s += format(C[i,0],".2f") + " "
+            if flag_mass_output:
+                output_s += format(ppm_to_mass_concentration(i,C[i,0],T,cscd),".2f") + " "
+            else:
+                output_s += format(C[i,0],".2f") + " "
+
         print(output_s)
 else:
     print(str(num_of_errors) + #First output token a aproblem flag (number of errors)
