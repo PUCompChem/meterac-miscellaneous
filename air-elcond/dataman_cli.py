@@ -12,10 +12,11 @@ allowed_operation_list = ["wf-plot", "min-max-plot", "stat", "average-spectrum"]
 operations_str = "wf-plot, min-max-plot, stat, average-spectrum"
 
 class CLIOption:
-    def __init__(self, shortName: str, longName: str, requiresArgument : bool):
+    def __init__(self, shortName: str, longName: str, requiresArgument : bool, info: str = ""):
         self.shortName = shortName
         self.longName = longName
         self.requiresArgument = requiresArgument
+        self.info = info
 
     def checkOption(self, arg: str) -> bool:
         #Checking whether the argument is an CLI option:
@@ -82,6 +83,8 @@ def print_help(options: list[CLIOption]):
     print("   -i <input-file> -o <output-file> -v -p <operations-list>")
     print("If operation is missing all possible operations are performed: ")
     print("      " + "wf-plot, min-max-plot, stat, average-spectrum")
+    for opt in options:
+        print("-"+opt.shortName + "  --" + opt.longName + "    " + opt.info)
 
 #Setting CLI options and default file names
 options = [CLIOption("i","input", True), 
