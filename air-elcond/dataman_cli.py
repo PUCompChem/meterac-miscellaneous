@@ -103,7 +103,7 @@ def set_plot_config():
     pconf.figure_width = 12
     pconf.figure_height = 6
     pconf.file_padding = 0.05
-    pconf.y_ticks_index_step = 80
+    pconf.y_ticks_index_step = 20
     #pconf.hide_x_ticks = True
     pconf.color_map = "gist_ncar_r"
     pconf.set_vmin_vmax = False

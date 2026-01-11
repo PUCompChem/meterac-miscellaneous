@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-class AaroniaData:
+class SpectralData:
     def __init__(self):        
         self.frequencies = None #list[float]
         self.data_matrix = []
@@ -96,8 +96,8 @@ def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     return values
 
 
-def extract_data_from_aaronia_file(fileName: str) -> AaroniaData:
-    adata = AaroniaData()
+def extract_data_from_aaronia_file(fileName: str) -> SpectralData:
+    adata = SpectralData()
     #initial data matrices    
     data_matrix0 = [] 
     sweep_start0 = []
@@ -204,7 +204,7 @@ def aaronia_file_data_to_csv(aaroniaFileName: str, csvFileName: str):
         file.write("\n")
     file.close()
 
-def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig = None):
+def get_heatmap_plot(adata: SpectralData, fileName = None, plotConfig: PlotConfig = None):
     pconf = plotConfig
     if pconf == None:        
         pconf = PlotConfig()  #using default configuration
@@ -246,7 +246,7 @@ def get_heatmap_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig
         plt.savefig(fileName, bbox_inches='tight', pad_inches=pconf.file_padding)
 
 
-def get_min_max_average_plot(adata: AaroniaData, fileName = None, plotConfig: PlotConfig = None):
+def get_min_max_average_plot(adata: SpectralData, fileName = None, plotConfig: PlotConfig = None):
     pconf = plotConfig
     if pconf == None:        
         pconf = PlotConfig()  #using default configuration
