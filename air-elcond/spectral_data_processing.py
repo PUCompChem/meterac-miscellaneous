@@ -2,6 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+class Metrics:
+    def __init__(self):
+        self.designations = None #list[str]
+        self.values = None #list[float]
+        self.time_begin = 0
+        self.time_end = 0
+
 class SpectralData:
     def __init__(self):        
         self.frequencies = None #list[float]
@@ -16,7 +23,7 @@ class SpectralData:
         self.average_spectrum = None  #np NDArray
         self.delta_spectrum = None  #np NDArray
         self.metrics_intervals = None
-    
+            
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
         max_len = len(self.data_matrix[0])
@@ -81,10 +88,12 @@ class SpectralData:
                 endValue = n-1
             interval.append(endValue)
             prevEndValue = endValue
-            self.metrics_intervals.append(interval)        
+            self.metrics_intervals.append(interval)
 
-    def print_metrics(self):
-        pass   
+    def calc_metrics_for_lines(self, start_line: int, end_line: int) -> Metrics:
+        metr = Metrics()
+        # TODO
+        return metr
 
 class PlotConfig:
     def __init__(self): 
