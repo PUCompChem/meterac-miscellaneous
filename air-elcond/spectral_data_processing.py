@@ -75,21 +75,9 @@ class SpectralData:
         self.max_spectrum = np.max(z, axis=0)
         self.delta_spectrum =  self.max_spectrum - self.min_spectrum  
 
-    def get_even_metrics_intervals(self, numIntervals: int) -> []:
-        self.metrics_intervals = []
-        n = len(self.frequencies)
-        delta = n / numIntervals
-        prevEndValue = -1
-        for i in range(numIntervals):
-            interval = []
-            interval.append(prevEndValue + 1)
-            endValue = math.floor((i+1) * delta)
-            if endValue >= n:
-                endValue = n-1
-            interval.append(endValue)
-            prevEndValue = endValue
-            self.metrics_intervals.append(interval)
-
+    def get_even_metrics_intervals(self, numIntervals: int):
+        self.metrics_intervals = get_even_intervals(len(self.frequencies), numIntervals)
+    
     def calc_metrics_for_lines(self, start_line: int, end_line: int) -> Metrics:
         metr = Metrics()
         # TODO
@@ -299,3 +287,19 @@ def get_min_max_average_plot(adata: SpectralData, fileName = None, plotConfig: P
     else:
         plt.savefig(fileName, bbox_inches='tight', pad_inches=pconf.file_padding)
 
+def get_even_intervals(num_objects: int, num_intervals: int) -> []:
+    intervals = []
+    n = num_objects
+    delta = n / num_intervals
+    prevEndValue = -1
+    for i in range(num_intervals):
+        interval = []
+        interval.append(prevEndValue + 1)
+        endValue = math.floor((i+1) * delta)
+        if endValue >= n:
+            endValue = n-1
+        interval.append(endValue)
+        prevEndValue = endValue
+        intervals.append(interval)
+
+    return intervals    
