@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 class SpectralData:
     def __init__(self):        
@@ -14,6 +15,7 @@ class SpectralData:
         self.max_spectrum = None   #np NDArray
         self.average_spectrum = None  #np NDArray
         self.delta_spectrum = None  #np NDArray
+        self.metrics_intervals = None
     
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
@@ -66,7 +68,22 @@ class SpectralData:
         self.max_spectrum = np.max(z, axis=0)
         self.delta_spectrum =  self.max_spectrum - self.min_spectrum  
 
-    def print_basic_metrics(self):
+    def get_even_metrics_intervals(self, numIntervals: int) -> []:
+        self.metrics_intervals = []
+        n = len(self.frequencies)
+        delta = n / numIntervals
+        prevEndValue = -1
+        for i in range(numIntervals):
+            interval = []
+            interval.append(prevEndValue + 1)
+            endValue = math.floor((i+1) * delta)
+            if endValue >= n:
+                endValue = n-1
+            interval.append(endValue)
+            prevEndValue = endValue
+            self.metrics_intervals.append(interval)        
+
+    def print_metrics(self):
         pass   
 
 class PlotConfig:
