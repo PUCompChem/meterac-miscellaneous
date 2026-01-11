@@ -1,11 +1,11 @@
 '''
-Console app for managing aaronia data
+Console app for managing air spectral data
 '''
 
 import sys
 import os
 sys.path.append("./")
-from aaronia_sweep_process import *
+from spectral_data_processing import *
 
 errors_out = []
 allowed_operation_list = ["wf-plot", "min-max-plot", "stat", "average-spectrum"]
