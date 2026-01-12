@@ -4,8 +4,8 @@ import math
 
 class Metrics:
     def __init__(self):
-        self.designations = None #list[str]
-        self.values = None #list[float]
+        self.designations = [] #list[str]
+        self.values = [] #list[float]
         self.time_begin = 0
         self.time_end = 0
 
@@ -79,12 +79,28 @@ class SpectralData:
         self.metrics_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
     
     def calc_metrics_for_lines(self, start_line: int, end_line: int) -> Metrics:
+        #Getting lines in a np array
+        z = np.array(self.data_matrix[start_line:end_line], dtype='float32')
+        z_mean = np.mean(z, axis=0)
+        z_min = np.min(z, axis=0)
+        z_max = np.max(z, axis=0)
+        z_delta = z_max - z_min
+        #a = 10
+        #print("min: ", z_min[:a])
+        #print("max: ", z_max[:a])
+        #print("delta: ", z_delta[:a])
+
         metr = Metrics()
         n = len(self.metrics_intervals)
         # Interval max delta
         for i in range(n):
-            interval = self.metrics_intervals[i]
-
+            i_begin, i_end = self.metrics_intervals[i]            
+            #print("interval indices: ", i_begin, i_end)
+            d = z_delta[i_begin:i_end]
+            max_d = np.max(d)
+            #print("max_d", max_d)
+            metr.values.append(max_d)
+            metr.designations.append("max_d_" + str(i+1))
         return metr
     
     def calc_metrics_for_entire_data_matrix(self) -> Metrics:
