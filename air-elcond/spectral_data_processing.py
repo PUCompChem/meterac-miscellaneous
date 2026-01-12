@@ -85,7 +85,7 @@ class SpectralData:
         z_min = np.min(z, axis=0)
         z_max = np.max(z, axis=0)
         z_delta = z_max - z_min
-        #a = 10
+        a = 10
         #print("min: ", z_min[:a])
         #print("max: ", z_max[:a])
         #print("delta: ", z_delta[:a])
@@ -98,9 +98,15 @@ class SpectralData:
             #print("interval indices: ", i_begin, i_end)
             d = z_delta[i_begin:i_end]
             max_d = np.max(d)
-            #print("max_d", max_d)
             metr.values.append(max_d)
             metr.designations.append("max_d_" + str(i+1))
+        # Interval RMS delta
+        for i in range(n):
+            i_begin, i_end = self.metrics_intervals[i]
+            d = z_delta[i_begin:i_end]
+            rms_d = np.sqrt(np.mean(d**2))
+            metr.values.append(rms_d)
+            metr.designations.append("rms_d_" + str(i+1))
         return metr
     
     def calc_metrics_for_entire_data_matrix(self) -> Metrics:
