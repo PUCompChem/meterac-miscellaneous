@@ -92,6 +92,7 @@ class SpectralData:
 
         metr = Metrics()
         n = len(self.metrics_intervals)
+        
         # Interval max delta
         for i in range(n):
             i_begin, i_end = self.metrics_intervals[i]            
@@ -100,6 +101,7 @@ class SpectralData:
             max_d = np.max(d)
             metr.values.append(max_d)
             metr.designations.append("max_d_" + str(i+1))
+        
         # Interval RMS delta
         for i in range(n):
             i_begin, i_end = self.metrics_intervals[i]
@@ -107,6 +109,39 @@ class SpectralData:
             rms_d = np.sqrt(np.mean(d**2))
             metr.values.append(rms_d)
             metr.designations.append("rms_d_" + str(i+1))
+        
+        # Intensity statistics
+        range_rms_min_values = []
+        range_rms_min_designations = []
+        range_rms_max_values = []
+        range_rms_max_designations = []
+        range_rms_span_values = []
+        range_rms_span_designations = []
+        for i in range(n):
+            i_begin, i_end = self.metrics_intervals[i]
+            # Get interval columns
+            z1 = z[...,i_begin:i_end]
+            #RMS per rows
+            z1_2 = z1**2
+            ms =  np.mean(z1_2, axis=1)  #an array with means for each row
+            rms = ms**0.5
+            #print("rms: ", rms)
+            rms_min = np.min(rms)
+            rms_max = np.max(rms)
+            rms_span = rms_max - rms_min
+            range_rms_min_values.append(rms_min)
+            range_rms_min_designations.append("range_rms_min_" + str(i+1))
+            range_rms_max_values.append(rms_max)
+            range_rms_max_designations.append("range_rms_max_" + str(i+1))
+            range_rms_span_values.append(rms_span)
+            range_rms_span_designations.append("range_rms_span_" + str(i+1))
+        metr.values.extend(range_rms_min_values)
+        metr.designations.extend(range_rms_min_designations)
+        metr.values.extend(range_rms_max_values)
+        metr.designations.extend(range_rms_max_designations)
+        metr.values.extend(range_rms_span_values)
+        metr.designations.extend(range_rms_span_designations)
+
         return metr
     
     def calc_metrics_for_entire_data_matrix(self) -> Metrics:
