@@ -76,12 +76,19 @@ class SpectralData:
         self.delta_spectrum =  self.max_spectrum - self.min_spectrum  
 
     def get_even_metrics_intervals(self, numIntervals: int):
-        self.metrics_intervals = get_even_intervals(len(self.frequencies), numIntervals)
+        self.metrics_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
     
     def calc_metrics_for_lines(self, start_line: int, end_line: int) -> Metrics:
         metr = Metrics()
-        # TODO
+        n = len(self.metrics_intervals)
+        # Interval max delta
+        for i in range(n):
+            interval = self.metrics_intervals[i]
+
         return metr
+    
+    def calc_metrics_for_entire_data_matrix(self) -> Metrics:
+        return self.calc_metrics_for_lines(0, len(self.data_matrix) -1)
 
 class PlotConfig:
     def __init__(self): 
@@ -287,17 +294,18 @@ def get_min_max_average_plot(adata: SpectralData, fileName = None, plotConfig: P
     else:
         plt.savefig(fileName, bbox_inches='tight', pad_inches=pconf.file_padding)
 
-def get_even_intervals(num_objects: int, num_intervals: int) -> []:
+def get_even_slice_intervals(num_objects: int, num_intervals: int) -> []:
+    #generates interval in slicing manner (last index to be excluded)
     intervals = []
     n = num_objects
     delta = n / num_intervals
-    prevEndValue = -1
+    prevEndValue = 0
     for i in range(num_intervals):
         interval = []
-        interval.append(prevEndValue + 1)
+        interval.append(prevEndValue)
         endValue = math.floor((i+1) * delta)
-        if endValue >= n:
-            endValue = n-1
+        if endValue > n:
+            endValue = n
         interval.append(endValue)
         prevEndValue = endValue
         intervals.append(interval)
