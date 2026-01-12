@@ -367,4 +367,14 @@ def get_even_slice_intervals(num_objects: int, num_intervals: int) -> []:
         prevEndValue = endValue
         intervals.append(interval)
 
-    return intervals    
+    return intervals
+
+
+def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
+    min = np.min(data)
+    max = np.max(data)
+    num_bins = math.ceil((max-min)/bin_delta)
+    hist, bins = np.histogram(data, bins=num_bins)
+    print("bins: ", bins)
+    print("hist: ", hist)
+    #TODO calc entropy
