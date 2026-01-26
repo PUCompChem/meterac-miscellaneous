@@ -8,7 +8,7 @@ class Metrics:
         self.values = [] #list[float]
         self.time_begin = 0
         self.time_end = 0
-        self.single_line_metrics = False
+        self.single_line_metrics = True
 
 class SpectralData:
     def __init__(self):        
@@ -79,6 +79,11 @@ class SpectralData:
     def get_even_metrics_intervals(self, numIntervals: int):
         self.metrics_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
     
+    def calc_metrics_for_single_line(self, line_num: int) -> Metrics:
+        #TODO
+        metr = Metrics()
+        return metr
+
     def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int) -> Metrics:
         #Getting lines in a np array
         z = np.array(self.data_matrix[start_line:end_line], dtype='float32')
@@ -92,6 +97,7 @@ class SpectralData:
         #print("delta: ", z_delta[:a])
 
         metr = Metrics()
+        metr.single_line_metrics = False
         n = len(self.metrics_intervals)
         
         # Interval max delta
@@ -142,7 +148,7 @@ class SpectralData:
         metr.designations.extend(range_rms_max_designations)
         metr.values.extend(range_rms_span_values)
         metr.designations.extend(range_rms_span_designations)
-
+                
         return metr
     
     def calc_metrics_for_entire_data_matrix(self) -> Metrics:
