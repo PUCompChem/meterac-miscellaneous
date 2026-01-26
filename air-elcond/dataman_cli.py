@@ -8,8 +8,9 @@ sys.path.append("./")
 from spectral_data_processing import *
 
 errors_out = []
-allowed_operation_list = ["wf-plot", "min-max-plot", "stat", "average-spectrum", "metrics"]
-operations_str = "wf-plot,min-max-plot,stat,average-spectrum,metrics"
+allowed_operation_list = ["wf-plot", "min-max-plot", "average-spectrum", "metrics"]
+operations_str = "wf-plot,min-max-plot,average-spectrum,metrics"
+cfg = None
 
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool, info: str = ""):
@@ -79,10 +80,10 @@ def check_standard_option(opt: str) -> str:
 def print_help(options: list[CLIOption]):
     print("CLI application for managing aaronia data.")
     #print("Basic input arguments: ...")
-    print("Full argument list:")
+    print("Example argument list:")
     print("   -i <input-file> -o <output-file> -v -p <operations-list>")
-    print("If operation is missing all possible operations are performed: ")
-    print("      " + "wf-plot, min-max-plot, stat, average-spectrum")
+    print("If operation (-p) and config (-c) are missing all possible operations are performed: ")
+    print("      " + "wf-plot, min-max-plot, average-spectrum, metrics")
     for opt in options:
         print("-"+opt.shortName + "  --" + opt.longName + "    " + opt.info)
 
@@ -125,6 +126,19 @@ if flag_help:
 
 flag_verbose = "verbose" in arguments["boolean_options"]
 
+if "config" in arguments["standard_options"].keys():
+    fname = arguments["standard_options"]["config"]
+    if fname != None:
+        cfg = load_spectra_process_config_from_property_file(fname)
+        n_err = len(cfg.parse_errors)
+        if  n_err > 0:
+            for i in range(n_err):
+                errors_out.append("Config file error: " + cfg.parser_errors[i])
+                num_of_errors += 1
+    else:
+        errors_out.append("Option -c (--config) has no argument!")
+        num_of_errors += 1
+
 if "input" in arguments["standard_options"].keys():
     fname = arguments["standard_options"]["input"]
     if fname != None:
@@ -133,8 +147,11 @@ if "input" in arguments["standard_options"].keys():
         errors_out.append("Option -i (--input) has no argument!")
         num_of_errors += 1
 else:
-    errors_out.append("Option -i (--input) is requred!")
-    num_of_errors += 1
+    if cfg == None or cfg.input == None:
+        errors_out.append("Option -i (--input) is requred when input is not set via config file!")
+        num_of_errors += 1
+    else:
+        input_file = cfg.input 
 
 if "output" in arguments["standard_options"].keys():
     fname = arguments["standard_options"]["output"]
@@ -144,9 +161,10 @@ if "output" in arguments["standard_options"].keys():
         errors_out.append("Option -o (--output) has no argument!")
         num_of_errors += 1        
 else:
+    if cfg != None and cfg.output != None:
+        output_file = cfg.output
     #errors_out.append("Option -o (--output) is requred!")
-    #num_of_errors += 1
-    pass
+    #num_of_errors += 1    
 
 if "operations" in arguments["standard_options"].keys():
     operations_str = arguments["standard_options"]["operations"]
@@ -185,6 +203,7 @@ if flag_verbose and len(adata.errors) > 0:
 #Handle input file name and prepare output file names
 input_dir, input_file_name = os.path.split(input_file)
 if output_file == None:
+    print("Output not specifiad via option -o nor via config file (option -c).")
     print("Using input file directory for output: " + input_dir)
     output_file = input_dir
 
