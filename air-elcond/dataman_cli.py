@@ -8,8 +8,8 @@ sys.path.append("./")
 from spectral_data_processing import *
 
 errors_out = []
-allowed_operation_list = ["wf-plot", "min-max-plot", "stat", "average-spectrum"]
-operations_str = "wf-plot, min-max-plot, stat, average-spectrum"
+allowed_operation_list = ["wf-plot", "min-max-plot", "stat", "average-spectrum", "metrics"]
+operations_str = "wf-plot,min-max-plot,stat,average-spectrum,metrics"
 
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool, info: str = ""):
