@@ -167,6 +167,7 @@ class PlotConfig:
 class SpectraProcessConfig:
     def __init__(self):
         self.basic_time_step = 600 #in seconds
+        self.parse_errors = []
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     tokens = s.split(splitter)
@@ -386,6 +387,8 @@ def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
 
 def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProcessConfig:
     props = {}
+    sp_cfg = SpectraProcessConfig()
+
     with open(filepath, "rt") as f:
         for line in f:
             l = line.strip()
@@ -397,5 +400,15 @@ def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProc
                 value = tokens[1].strip()
                 if key != '' and value != '': 
                     props[key] = value 
-    #TODO                
-    return None
+    
+    #Parse properties
+    basic_time_step_prop = props.get("BASIC_TIME_STEP")
+    if (basic_time_step_prop!= None):
+        try:
+            bts = int(basic_time_step_prop)
+        except Exception as e:
+            sp_cfg.parse_errors.append("BASIC_TIME_STEP is not correct integer: " + basic_time_step_prop)
+        else:
+            sp_cfg.basic_time_step = bts
+    
+    return sp_cfg
