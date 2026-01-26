@@ -164,6 +164,10 @@ class PlotConfig:
         self.set_vmin_vmax = True
         self.color_map = "gist_ncar_r" #"YlGnBu"
 
+class SpectraProcessConfig:
+    def __init__(self):
+        self.basic_time_step = 600 #in seconds
+
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
     tokens = s.split(splitter)
     values = []
@@ -378,3 +382,20 @@ def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     print("bins: ", bins)
     print("hist: ", hist)
     #TODO calc entropy
+
+
+def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProcessConfig:
+    props = {}
+    with open(filepath, "rt") as f:
+        for line in f:
+            l = line.strip()
+            if l != '' and not l.startswith("#"):
+                tokens = l.split("=")
+                if len(tokens) != 2:
+                    continue
+                key = tokens[0].strip()
+                value = tokens[1].strip()
+                if key != '' and value != '': 
+                    props[key] = value 
+    #TODO                
+    return None
