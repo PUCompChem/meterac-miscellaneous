@@ -8,6 +8,7 @@ class Metrics:
         self.values = [] #list[float]
         self.time_begin = 0
         self.time_end = 0
+        self.single_line_metrics = False
 
 class SpectralData:
     def __init__(self):        
@@ -78,7 +79,7 @@ class SpectralData:
     def get_even_metrics_intervals(self, numIntervals: int):
         self.metrics_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
     
-    def calc_metrics_for_lines(self, start_line: int, end_line: int) -> Metrics:
+    def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int) -> Metrics:
         #Getting lines in a np array
         z = np.array(self.data_matrix[start_line:end_line], dtype='float32')
         z_mean = np.mean(z, axis=0)
@@ -166,7 +167,12 @@ class PlotConfig:
 
 class SpectraProcessConfig:
     def __init__(self):
-        self.basic_time_step = 600 #in seconds
+        self.tasks_string = None
+        self.group_time_step = 600 #in seconds
+        self.group_num_of_lines = 10
+        self.append_to_output = True
+        self.input = None
+        self.output = None
         self.parse_errors = []
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
@@ -384,6 +390,12 @@ def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     print("hist: ", hist)
     #TODO calc entropy
 
+def parse_boolean_value(s: str) -> bool:
+    if s.lower() == "true" or s == "1":
+        return True
+    if s.lower() == "false" or s == "0":
+        return False
+    return None #This is error code for incorrect string
 
 def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProcessConfig:
     props = {}
@@ -402,13 +414,41 @@ def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProc
                     props[key] = value 
     
     #Parse properties
-    basic_time_step_prop = props.get("BASIC_TIME_STEP")
-    if (basic_time_step_prop!= None):
+    p = props.get("TASKS")
+    if p!= None:
+        sp_cfg.tasks_string = p
+
+    p = props.get("INPUT")
+    if p!= None:
+        sp_cfg.input = p    
+
+    p = props.get("OUTPUT")
+    if p!= None:
+        sp_cfg.output = p
+
+    p = props.get("GROUP_TIME_STEP")
+    if p!= None:
         try:
-            bts = int(basic_time_step_prop)
+            val = float(p)
         except Exception as e:
-            sp_cfg.parse_errors.append("BASIC_TIME_STEP is not correct integer: " + basic_time_step_prop)
+            sp_cfg.parse_errors.append("BASIC_TIME_STEP is not correct float: " + p)
         else:
-            sp_cfg.basic_time_step = bts
-    
+            sp_cfg.group_time_step = val
+
+    p = props.get("GROUP_NUM_OF_LINES")
+    if p != None:
+        try:
+            val = int(p)
+        except Exception as e:
+            sp_cfg.parse_errors.append("GROUP_NUM_OF_LINES is not correct int: " + p)
+        else:
+            sp_cfg.group_num_of_lines = val
+
+    p = props.get("APPEND_TO_OUTPUT")
+    if p!= None:
+       bval = parse_boolean_value(p)
+       if bval == None:
+           sp_cfg.parse_errors.append("APPEND_TO_OUTPUT is incorrectly defined: " + p)  
+       else:
+           sp_cfg.append_to_output = bval               
     return sp_cfg
