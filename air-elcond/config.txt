@@ -1,0 +1,10 @@
+
+#Processing setup
+TASKS = metrics
+GROUP_TIME_STEP = 400
+GROUP_NUM_OF_LINES = 10
+
+#I/O setup
+APPEND_TO_OUTPUT = 1
+INPUT = ./test-input.txt
+OUTPUT = ./test-output.txt
