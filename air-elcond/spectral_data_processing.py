@@ -188,6 +188,8 @@ class SpectralData:
             end_line = cur_line + group_size
             if end_line > num_lines:
                 end_line = num_lines
+            if end_line - cur_line < group_size/2:
+                break #if the last group of lines is not "full enough" it is omitted
             metr = self.calc_metrics_for_group_of_lines(cur_line, end_line)
             metr_arr.append(metr)
             cur_line = cur_line + group_size
