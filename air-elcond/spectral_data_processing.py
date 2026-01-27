@@ -127,6 +127,8 @@ class SpectralData:
         metr = Metrics()
         metr.single_line_metrics = False
         n = len(self.frequency_intervals)
+        metr.time_begin = self.utc_start[start_line]
+        metr.time_end = self.utc_stop[end_line-1]
         
         # Interval max delta
         for i in range(n):
