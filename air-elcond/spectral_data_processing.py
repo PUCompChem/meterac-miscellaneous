@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import os.path
+from datetime import datetime, timezone
 
 class Metrics:
     def __init__(self):
@@ -15,8 +16,10 @@ class SpectralData:
     def __init__(self):        
         self.frequencies = None #list[float]
         self.data_matrix = []
-        self.sweep_start = []
-        self.sweep_stop = []
+        self.sweep_start = []  #stored as string
+        self.sweep_stop = []   #stored as string
+        self.utc_start = []
+        self.utc_stop = []
         self.frequency_unit = "MHz"
         self.frequency_factor = 1.0e-6
         self.errors = []
@@ -85,6 +88,8 @@ class SpectralData:
         z1 = np.array(self.data_matrix[line_num], dtype='float32')
         
         metr = Metrics()
+        metr.time_begin = self.utc_start[line_num]
+        metr.time_end = self.utc_stop[line_num]
         n = len(self.frequency_intervals)
 
         # Interval mean
@@ -213,6 +218,10 @@ def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
             values.append(float(tok))
     return values
 
+def get_timestamp(time_string: str, dt_format: str) -> int:
+    dt = datetime.strptime(time_string, dt_format).replace(tzinfo=timezone.utc)
+    return dt.timestamp()
+    
 
 def extract_data_from_aaronia_file(fileName: str) -> SpectralData:
     adata = SpectralData()
@@ -226,6 +235,7 @@ def extract_data_from_aaronia_file(fileName: str) -> SpectralData:
     val_SweepPoints = -1
     sweepStart = None
     sweepStop = None
+    dt_format = "%Y-%m-%dT%H:%M:%S.%f"
     
     with open(fileName, mode ='r') as file:
         n = 0
@@ -296,6 +306,8 @@ def extract_data_from_aaronia_file(fileName: str) -> SpectralData:
             adata.data_matrix.append(data_matrix0[i])
             adata.sweep_start.append(sweep_start0[i])
             adata.sweep_stop.append(sweep_stop0[i])
+            adata.utc_start.append(get_timestamp(sweep_start0[i], dt_format))
+            adata.utc_stop.append(get_timestamp(sweep_stop0[i], dt_format))
         else:
             adata.errors.append("Matrix line " + str(i+1)
                                 + "  contains less data points, " + str(len(data_matrix0[i])) + 
