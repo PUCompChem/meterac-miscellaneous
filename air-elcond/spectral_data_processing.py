@@ -80,8 +80,30 @@ class SpectralData:
         self.frequency_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
     
     def calc_metrics_for_single_line(self, line_num: int) -> Metrics:
-        #TODO
+        #Get single line as a np array
+        z1 = np.array(self.data_matrix[line_num], dtype='float32')
+        
         metr = Metrics()
+        n = len(self.frequency_intervals)
+
+        # Interval mean
+        for i in range(n):
+            i_begin, i_end = self.frequency_intervals[i]
+            z1_i = z1[i_begin:i_end]
+            i_mean = np.mean(z1_i)
+            metr.values.append(i_mean)
+            metr.designations.append("mean_" + str(i+1))
+
+        # Interval span
+        for i in range(n):
+            i_begin, i_end = self.frequency_intervals[i]
+            z1_i = z1[i_begin:i_end]
+            i_min = np.min(z1_i)
+            i_max = np.max(z1_i)
+            i_span = i_max - i_min
+            metr.values.append(i_span)
+            metr.designations.append("span_" + str(i+1))
+        
         return metr
 
     def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int) -> Metrics:
