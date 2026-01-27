@@ -212,6 +212,9 @@ dot_index = input_file_name.rfind(".")
 if dot_index != -1:
     out_file_prefix = input_file_name[:dot_index]
 
+if cfg == None:
+    cfg = SpectraProcessConfig ()
+
 #print(out_file_prefix)
 if "wf-plot" in operations:
     if flag_verbose:
@@ -237,5 +240,5 @@ if "metrics" in operations:
     save_metrics_data_to_file(metr_arr, sl_out_file, True, ",")
 
     #Calc group metrics
-    metr_arr = adata.calc_metrics_by_groups(10)
+    metr_arr = adata.calc_metrics_by_groups(cfg.group_num_of_lines)
     save_metrics_data_to_file(metr_arr, grp_out_file, True, ",")
