@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import os.path
 
 class Metrics:
     def __init__(self):
@@ -480,3 +481,39 @@ def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProc
        else:
            sp_cfg.append_to_output = bval               
     return sp_cfg
+
+
+def save_metrics_data_to_file(metr_arr: list[Metrics], fname:str, append_mode:bool, sep: str):
+    file_already_exists = os.path.isfile(fname)    
+    n = len(metr_arr[0].designations)
+    file = None
+
+    if append_mode:
+        file = open(fname, 'a')
+    else: 
+        file = open(fname, 'w')
+
+    #Add header line in the begining of the file when needed
+    if not file_already_exists or not append_mode:        
+        if metr_arr[0].single_line_metrics:
+            file.write("time")
+        else:
+            file.write("time_begin" + sep + "time_end")
+        for i in range(n):
+            file.write(sep)
+            file.write(metr_arr[0].designations[i])
+        file.write("\n")    #os.linesep
+        
+    for k in range(len(metr_arr)):
+        metr = metr_arr[k]
+        file.write(str(metr.time_begin))
+        if not metr.single_line_metrics:
+            file.write(sep)
+            file.write(str(metr.time_end))
+        for i in range(n):
+            file.write(sep)
+            file.write(str(metr.values[i]))
+        file.write("\n")    #os.linesep
+
+    file.close()
+
