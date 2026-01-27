@@ -23,7 +23,7 @@ class SpectralData:
         self.max_spectrum = None   #np NDArray
         self.average_spectrum = None  #np NDArray
         self.delta_spectrum = None  #np NDArray
-        self.metrics_intervals = None
+        self.frequency_intervals = None
             
     def check_matrix_dimensions(self):
         min_len = len(self.data_matrix[0])
@@ -76,8 +76,8 @@ class SpectralData:
         self.max_spectrum = np.max(z, axis=0)
         self.delta_spectrum =  self.max_spectrum - self.min_spectrum  
 
-    def get_even_metrics_intervals(self, numIntervals: int):
-        self.metrics_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
+    def get_even_frequency_intervals(self, numIntervals: int):
+        self.frequency_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
     
     def calc_metrics_for_single_line(self, line_num: int) -> Metrics:
         #TODO
@@ -85,7 +85,7 @@ class SpectralData:
         return metr
 
     def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int) -> Metrics:
-        #Getting lines in a np array
+        #Getting group lines in a np array
         z = np.array(self.data_matrix[start_line:end_line], dtype='float32')
         z_mean = np.mean(z, axis=0)
         z_min = np.min(z, axis=0)
@@ -98,11 +98,11 @@ class SpectralData:
 
         metr = Metrics()
         metr.single_line_metrics = False
-        n = len(self.metrics_intervals)
+        n = len(self.frequency_intervals)
         
         # Interval max delta
         for i in range(n):
-            i_begin, i_end = self.metrics_intervals[i]            
+            i_begin, i_end = self.frequency_intervals[i]            
             #print("interval indices: ", i_begin, i_end)
             d = z_delta[i_begin:i_end]
             max_d = np.max(d)
@@ -111,7 +111,7 @@ class SpectralData:
         
         # Interval RMS delta
         for i in range(n):
-            i_begin, i_end = self.metrics_intervals[i]
+            i_begin, i_end = self.frequency_intervals[i]
             d = z_delta[i_begin:i_end]
             rms_d = np.sqrt(np.mean(d**2))
             metr.values.append(rms_d)
@@ -125,7 +125,7 @@ class SpectralData:
         range_rms_span_values = []
         range_rms_span_designations = []
         for i in range(n):
-            i_begin, i_end = self.metrics_intervals[i]
+            i_begin, i_end = self.frequency_intervals[i]
             # Get interval columns
             z1 = z[...,i_begin:i_end]
             #RMS per rows
