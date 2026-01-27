@@ -191,8 +191,8 @@ if num_of_errors > 0:
     exit()
 
 #Performs operations
-if flag_verbose and (not flag_default_operations):
-    print("Performing operations: ", operations_str)
+#if flag_verbose and (not flag_default_operations):
+print("Performing operations: ", operations_str)
 
 #Load and parse aaronia data file
 adata = extract_data_from_aaronia_file(input_file)
@@ -221,3 +221,21 @@ if "wf-plot" in operations:
         print("waterfall heatmap output:",figFileName)
     set_plot_config()
     get_heatmap_plot(adata, plotConfig = pconf, fileName = figFileName)
+
+
+if "metrics" in operations:
+    sl_out_file = output_file + "-sl.csv"
+    grp_out_file = output_file + "-grp.csv"
+    adata.get_even_frequency_intervals(6)
+
+    #Calc single line metrics
+    metr_arr = []
+    n = len(adata.data_matrix)
+    for i in range(n):
+        metr = adata.calc_metrics_for_single_line(i)
+        metr_arr.append(metr)    
+    save_metrics_data_to_file(metr_arr, sl_out_file, True, ",")
+
+    #Calc group metrics
+    metr_arr = adata.calc_metrics_by_groups(10)
+    save_metrics_data_to_file(metr_arr, grp_out_file, True, ",")

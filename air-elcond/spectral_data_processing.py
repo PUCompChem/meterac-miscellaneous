@@ -118,8 +118,7 @@ class SpectralData:
         z_mean = np.mean(z, axis=0)
         z_min = np.min(z, axis=0)
         z_max = np.max(z, axis=0)
-        z_delta = z_max - z_min
-        a = 10
+        z_delta = z_max - z_min        
         #print("min: ", z_min[:a])
         #print("max: ", z_max[:a])
         #print("delta: ", z_delta[:a])
@@ -181,8 +180,21 @@ class SpectralData:
                 
         return metr
     
+    def calc_metrics_by_groups(self, group_size: int) -> list[Metrics]:
+        num_lines = n = len(self.data_matrix)
+        cur_line = 0
+        metr_arr = []
+        while cur_line < num_lines:
+            end_line = cur_line + group_size
+            if end_line > num_lines:
+                end_line = num_lines
+            metr = self.calc_metrics_for_group_of_lines(cur_line, end_line)
+            metr_arr.append(metr)
+            cur_line = cur_line + group_size
+        return metr_arr    
+
     def calc_metrics_for_entire_data_matrix(self) -> Metrics:
-        return self.calc_metrics_for_lines(0, len(self.data_matrix) -1)
+        return self.calc_metrics_for_group_of_lines(0, len(self.data_matrix) -1)
 
 class PlotConfig:
     def __init__(self): 
