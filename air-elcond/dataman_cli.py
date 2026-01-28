@@ -121,9 +121,14 @@ flag_default_operations = False
 num_of_errors = 0
 arguments = extract_arguments(sys.argv, options)
 
-flag_help = "help" in arguments["boolean_options"]
-if flag_help:
+if "help" in arguments["boolean_options"]:
     print_help(options)
+    exit()
+
+if "metrics-info" in arguments["boolean_options"]:
+    print("Full list of metrics:")
+    for mi_item in metrics_info:
+        print("  ", mi_item)
     exit()
 
 flag_verbose = "verbose" in arguments["boolean_options"]

@@ -4,6 +4,10 @@ import math
 import os.path
 from datetime import datetime, timezone
 
+metrics_info = ["mean_i",
+                "span_i"
+                ]
+
 class Metrics:
     def __init__(self):
         self.designations = [] #list[str]
