@@ -84,16 +84,18 @@ def print_help(options: list[CLIOption]):
     print("   -i <input-file> -o <output-file> -v -p <operations-list>")
     print("If operation (-p) and config (-c) are missing all possible operations are performed: ")
     print("      " + "wf-plot, min-max-plot, average-spectrum, metrics")
+    print("Full list of options:")
     for opt in options:
-        print("-"+opt.shortName + "  --" + opt.longName + "    " + opt.info)
+        print("  -"+opt.shortName + "  --" + opt.longName + "    " + opt.info)
 
 #Setting CLI options and default file names
-options = [CLIOption("i","input", True), 
-           CLIOption("o","output", True),          
-           CLIOption("p","operations", True),
-           CLIOption("c","config", True),
-           CLIOption("v","verbose", False),           
-           CLIOption("h","help", False)]
+options = [CLIOption("i","input", True, "Input data file."), 
+           CLIOption("o","output", True, "Output path/file used for the resutls."),          
+           CLIOption("p","operations", True, "Specifies what opration are to be performed"),
+           CLIOption("c","config", True, "Specifies a config file."),
+           CLIOption("v","verbose", False, "More detailed info is output to the console."),
+           CLIOption("x","metrics-info", False, "Prints detailed metrics info."),           
+           CLIOption("h","help", False, "Prints this help.")]
 
 pconf = None
 
