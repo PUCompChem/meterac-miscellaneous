@@ -219,6 +219,8 @@ dot_index = input_file_name.rfind(".")
 if dot_index != -1:
     out_file_prefix = input_file_name[:dot_index]
 
+
+# Set default config when -c option is missing
 if cfg == None:
     cfg = SpectraProcessConfig ()
 
@@ -237,6 +239,7 @@ if "metrics" in operations:
     sl_out_file = output_file + "-sl.csv"
     grp_out_file = output_file + "-grp.csv"
     adata.get_even_frequency_intervals(6)
+    numformat = cfg.output_number_format
 
     #Calc single line metrics
     metr_arr = []
@@ -244,8 +247,8 @@ if "metrics" in operations:
     for i in range(n):
         metr = adata.calc_metrics_for_single_line(i)
         metr_arr.append(metr)    
-    save_metrics_data_to_file(metr_arr, sl_out_file, True, ",")
+    save_metrics_data_to_file(metr_arr, sl_out_file, True, ",", numformat)
 
     #Calc group metrics
     metr_arr = adata.calc_metrics_by_groups(cfg.group_num_of_lines)
-    save_metrics_data_to_file(metr_arr, grp_out_file, True, ",")
+    save_metrics_data_to_file(metr_arr, grp_out_file, True, ",", numformat)

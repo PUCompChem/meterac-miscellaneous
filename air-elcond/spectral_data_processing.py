@@ -227,6 +227,7 @@ class SpectraProcessConfig:
         self.append_to_output = True
         self.input = None
         self.output = None
+        self.output_number_format = "{:0.2f}"
         self.parse_errors = []
 
 def float_values_from_string(s : str, splitter : str = ";" ) -> list[float]:
@@ -515,7 +516,7 @@ def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProc
     return sp_cfg
 
 
-def save_metrics_data_to_file(metr_arr: list[Metrics], fname:str, append_mode:bool, sep: str):
+def save_metrics_data_to_file(metr_arr: list[Metrics], fname:str, append_mode:bool, sep: str, numformat: str):    
     file_already_exists = os.path.isfile(fname)    
     n = len(metr_arr[0].designations)
     file = None
@@ -544,7 +545,8 @@ def save_metrics_data_to_file(metr_arr: list[Metrics], fname:str, append_mode:bo
             file.write(str(metr.time_end))
         for i in range(n):
             file.write(sep)
-            file.write(str(metr.values[i]))
+            #file.write(str(metr.values[i]))
+            file.write(numformat.format(metr.values[i]))
         file.write("\n")    #os.linesep
 
     file.close()
