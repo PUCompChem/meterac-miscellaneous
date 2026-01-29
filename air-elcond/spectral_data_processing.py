@@ -224,6 +224,7 @@ class SpectraProcessConfig:
         #self.tasks_string = None
         self.group_time_step = 600 #in seconds
         self.group_num_of_lines = 10
+        self.num_of_frequency_intervals = 6
         self.append_to_output = True
         self.input = None
         self.output = None

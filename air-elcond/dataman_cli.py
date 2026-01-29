@@ -20,6 +20,9 @@ output_file = None
 operations = []
 flag_default_operations = False
 
+num_freq_intervals = None
+line_group_size = None
+
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool, info: str = ""):
         self.shortName = shortName
@@ -231,6 +234,13 @@ if dot_index != -1:
 if cfg == None:
     cfg = SpectraProcessConfig ()
 
+# Take default info from config file when needed
+if num_freq_intervals == None:
+    num_freq_intervals = cfg.num_of_frequency_intervals
+if line_group_size == None:
+    line_group_size = cfg.group_num_of_lines    
+
+
 #print(out_file_prefix)
 if "wf-plot" in operations:
     if flag_verbose:
@@ -245,7 +255,7 @@ if "wf-plot" in operations:
 if "metrics" in operations:
     sl_out_file = output_file + "-sl.csv"
     grp_out_file = output_file + "-grp.csv"
-    adata.get_even_frequency_intervals(6)
+    adata.get_even_frequency_intervals(num_freq_intervals)
     numformat = cfg.output_number_format
 
     #Calc single line metrics
@@ -257,5 +267,5 @@ if "metrics" in operations:
     save_metrics_data_to_file(metr_arr, sl_out_file, True, ",", numformat)
 
     #Calc group metrics
-    metr_arr = adata.calc_metrics_by_groups(cfg.group_num_of_lines)
+    metr_arr = adata.calc_metrics_by_groups(line_group_size)
     save_metrics_data_to_file(metr_arr, grp_out_file, True, ",", numformat)
