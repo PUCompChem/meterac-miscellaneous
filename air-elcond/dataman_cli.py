@@ -9,8 +9,16 @@ from spectral_data_processing import *
 
 errors_out = []
 allowed_operation_list = ["wf-plot", "min-max-plot", "average-spectrum", "metrics"]
-operations_str = "metrics"
+operations_str = "metrics"   #Default operations string
+
+#Initial work variable values
+pconf = None
 cfg = None
+input_file = None
+output_file = None
+
+operations = []
+flag_default_operations = False
 
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool, info: str = ""):
@@ -93,11 +101,14 @@ options = [CLIOption("i","input", True, "Input data file."),
            CLIOption("o","output", True, "Output path/file used for the resutls."),          
            CLIOption("p","operations", True, "Specifies what opration are to be performed"),
            CLIOption("c","config", True, "Specifies a config file."),
+           CLIOption("n","config", True, "Number of frequency intervals."),
+           CLIOption("g","config", True, "Group size - number of lines in a metrics aggregation group."),
            CLIOption("v","verbose", False, "More detailed info is output to the console."),
            CLIOption("x","metrics-info", False, "Prints detailed metrics info."),           
            CLIOption("h","help", False, "Prints this help.")]
 
-pconf = None
+
+
 
 def set_plot_config():
     pconf = PlotConfig()
@@ -111,11 +122,7 @@ def set_plot_config():
     pconf.color_map = "gist_ncar_r"
     pconf.set_vmin_vmax = False
 
-input_file = None
-output_file = None
 
-operations = []
-flag_default_operations = False
 
 #Handle CLI input arguments
 num_of_errors = 0
