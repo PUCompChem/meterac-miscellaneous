@@ -104,8 +104,8 @@ options = [CLIOption("i","input", True, "Input data file."),
            CLIOption("o","output", True, "Output path/file used for the resutls."),          
            CLIOption("p","operations", True, "Specifies what opration are to be performed"),
            CLIOption("c","config", True, "Specifies a config file."),
-           CLIOption("n","config", True, "Number of frequency intervals."),
-           CLIOption("g","config", True, "Group size - number of lines in a metrics aggregation group."),
+           CLIOption("n","num-freq-intervals", True, "Number of frequency intervals."),
+           CLIOption("g","group-size", True, "Group size - number of lines in a metrics aggregation group."),
            CLIOption("v","verbose", False, "More detailed info is output to the console."),
            CLIOption("x","metrics-info", False, "Prints detailed metrics info."),           
            CLIOption("h","help", False, "Prints this help.")]
@@ -181,7 +181,20 @@ else:
     if cfg != None and cfg.output != None:
         output_file = cfg.output
     #errors_out.append("Option -o (--output) is requred!")
-    #num_of_errors += 1    
+    #num_of_errors += 1
+
+if "num-freq-intervals" in arguments["standard_options"].keys():
+    nfreq_str = arguments["standard_options"]["num-freq-intervals"]
+    if nfreq_str != None:
+        try:
+            nfreq = int(nfreq_str)
+            num_freq_intervals = nfreq 
+        except Exception as e:
+            errors_out.append("Incorrect option -n (--num-freq-intervals). Must be an integer!")
+            num_of_errors += 1
+    else:
+        errors_out.append("Option -n (--num-freq-intervals) has no argument!")
+        num_of_errors += 1         
 
 if "operations" in arguments["standard_options"].keys():
     operations_str = arguments["standard_options"]["operations"]
