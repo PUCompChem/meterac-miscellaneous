@@ -424,7 +424,7 @@ def get_min_max_average_plot(adata: SpectralData, fileName = None, plotConfig: P
     else:
         plt.savefig(fileName, bbox_inches='tight', pad_inches=pconf.file_padding)
 
-def get_even_slice_intervals(num_objects: int, num_intervals: int) -> []:
+def get_even_slice_intervals(num_objects: int, num_intervals: int) -> list[object]:
     #generates interval in slicing manner (last index to be excluded)
     intervals = []
     n = num_objects
