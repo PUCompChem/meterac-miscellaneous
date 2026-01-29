@@ -221,7 +221,7 @@ class PlotConfig:
 
 class SpectraProcessConfig:
     def __init__(self):
-        self.tasks_string = None
+        #self.tasks_string = None
         self.group_time_step = 600 #in seconds
         self.group_num_of_lines = 10
         self.append_to_output = True
@@ -476,10 +476,11 @@ def load_spectra_process_config_from_property_file(filepath: str) -> SpectraProc
                     props[key] = value 
     
     #Parse properties
+    '''
     p = props.get("TASKS")
     if p!= None:
         sp_cfg.tasks_string = p
-
+    '''
     p = props.get("INPUT")
     if p!= None:
         sp_cfg.input = p    

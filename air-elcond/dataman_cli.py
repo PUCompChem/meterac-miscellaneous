@@ -9,7 +9,7 @@ from spectral_data_processing import *
 
 errors_out = []
 allowed_operation_list = ["wf-plot", "min-max-plot", "average-spectrum", "metrics"]
-operations_str = "wf-plot,min-max-plot,average-spectrum,metrics"
+operations_str = "metrics"
 cfg = None
 
 class CLIOption:
