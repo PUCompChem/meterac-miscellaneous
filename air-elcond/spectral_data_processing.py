@@ -46,6 +46,17 @@ class MetricsFlags:
         self.set_all_group_metrics(flag)
         self.set_all_single_line_metrics(flag)
 
+    def has_single_line_metrics(self) -> bool:
+        if self.calc_mean or self.calc_span:
+            return True
+        return False
+
+    def has_group_metrics(self) -> bool:
+        if self.calc_d_max or self.calc_d_rms or \
+           self.calc_s_rms_min or self.calc_s_rms_max or self.calc_s_rms_span:
+               return True
+        return False    
+
 def get_all_metrics_flags() -> MetricsFlags:
     mi = MetricsFlags()
     mi.set_all_flags(True)
@@ -57,7 +68,9 @@ def extract_metrics_flags_from_string(s: str, splitter: str = "," ) -> MetricsFl
     for tok in tokens:
         t = tok.strip()
         if t != '':
-            if t.lower() == "sl":
+            if t.lower() == "all":
+                mi.set_all_flags(True)
+            elif t.lower() == "sl":
                 mi.set_all_single_line_metrics(True)
             elif t.lower() == "grp":
                 mi.set_all_group_metrics(True)

@@ -292,15 +292,17 @@ if "metrics" in operations:
     grp_out_file = output_file + "-grp.csv"
     adata.get_even_frequency_intervals(num_freq_intervals)
     numformat = cfg.output_number_format
+    
+    if metrics_flags.has_single_line_metrics():
+        #Calc single line metrics
+        metr_arr = []
+        n = len(adata.data_matrix)
+        for i in range(n):
+            metr = adata.calc_metrics_for_single_line(i, metrics_flags)
+            metr_arr.append(metr)    
+        save_metrics_data_to_file(metr_arr, sl_out_file, True, ",", numformat)
 
-    #Calc single line metrics
-    metr_arr = []
-    n = len(adata.data_matrix)
-    for i in range(n):
-        metr = adata.calc_metrics_for_single_line(i, metrics_flags)
-        metr_arr.append(metr)    
-    save_metrics_data_to_file(metr_arr, sl_out_file, True, ",", numformat)
-
-    #Calc group metrics
-    metr_arr = adata.calc_metrics_by_groups(line_group_size, metrics_flags)
-    save_metrics_data_to_file(metr_arr, grp_out_file, True, ",", numformat)
+    if metrics_flags.has_group_metrics():
+        #Calc group metrics
+        metr_arr = adata.calc_metrics_by_groups(line_group_size, metrics_flags)
+        save_metrics_data_to_file(metr_arr, grp_out_file, True, ",", numformat)
