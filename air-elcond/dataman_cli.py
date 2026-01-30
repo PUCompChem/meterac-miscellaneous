@@ -6,6 +6,7 @@ import sys
 import os
 sys.path.append("./")
 from spectral_data_processing import *
+from graphutils import *
 
 errors_out = []
 allowed_operation_list = ["wf-plot", "min-max-plot", "average-spectrum", "metrics"]
@@ -179,7 +180,7 @@ if "output" in arguments["standard_options"].keys():
         num_of_errors += 1        
 else:
     if cfg != None and cfg.output != None:
-        output_file = cfg.output
+        output_file = cfg.output        
     #errors_out.append("Option -o (--output) is requred!")
     #num_of_errors += 1
 
@@ -259,7 +260,7 @@ if "wf-plot" in operations:
     if flag_verbose:
         print("wf-plot: genrating waterfall heatmap")
     figFileName = os.path.join(output_file,out_file_prefix+".png")
-    if flag_verbose:
+    if flag_verbose:        
         print("waterfall heatmap output:",figFileName)
     set_plot_config()
     get_heatmap_plot(adata, plotConfig = pconf, fileName = figFileName)
