@@ -94,8 +94,9 @@ def print_help(options: list[CLIOption]):
     #print("Basic input arguments: ...")
     print("Example argument list:")
     print("   -i <input-file> -o <output-file> -v -p <operations-list>")
-    print("If operation (-p) and config (-c) are missing all possible operations are performed: ")
-    print("      " + "wf-plot, min-max-plot, average-spectrum, metrics")
+    print("If -p option is missing, default operation is metrics")
+    #print("If operation (-p) and config (-c) are missing all possible operations are performed: ")
+    #print("      " + "wf-plot, min-max-plot, average-spectrum, metrics")
     print("Full list of options:")
     for opt in options:
         print("  -"+opt.shortName + "  --" + opt.longName + "    " + opt.info)
@@ -113,7 +114,7 @@ options = [CLIOption("i","input", True, "Input data file."),
 
 
 
-
+'''
 def set_plot_config():
     pconf = PlotConfig()
     pconf.x_ticks_index_step = 500
@@ -125,7 +126,7 @@ def set_plot_config():
     #pconf.hide_x_ticks = True
     pconf.color_map = "gist_ncar_r"
     pconf.set_vmin_vmax = False
-
+'''
 
 
 #Handle CLI input arguments
