@@ -3,9 +3,32 @@ import math
 import os.path
 from datetime import datetime, timezone
 
-metrics_info = ["mean_i",
-                "span_i"
+metrics_info = ["mean",
+                "span"
                 ]
+
+class MetricsFlags:
+    def __init__(self):
+        self.calc_mean = False
+        self.errors =[]
+    
+    def set_all_group_metrics(flag: bool):
+        pass
+
+    def set_all_single_line_metrics(flag: bool):
+        pass    
+
+def extract_metrics_flags_from_string(s : str, splitter : str = "," ) -> MetricsFlags:
+    mi = MetricsFlags()
+    tokens = s.split(splitter)
+    metrics_names = []
+    for tok in tokens:
+        t = tok.strip()
+        if t != '':
+            if t.lower() == "mean":
+                mi.calc_mean = True
+            #TODO    
+    return mi
 
 class Metrics:
     def __init__(self):
