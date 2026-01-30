@@ -6,6 +6,7 @@ import sys
 import os
 sys.path.append("./")
 from spectral_data_processing import *
+from fileutils import *
 #from graphutils import *
 
 errors_out = []
