@@ -46,6 +46,11 @@ class MetricsFlags:
         self.set_all_group_metrics(flag)
         self.set_all_single_line_metrics(flag)
 
+def get_all_metrics_flags() -> MetricsFlags:
+    mi = MetricsFlags()
+    mi.set_all_flags(True)
+    return mi
+
 def extract_metrics_flags_from_string(s : str, splitter : str = "," ) -> MetricsFlags:
     mi = MetricsFlags()
     tokens = s.split(splitter)   
@@ -54,6 +59,8 @@ def extract_metrics_flags_from_string(s : str, splitter : str = "," ) -> Metrics
         if t != '':
             if t.lower() == "sl":
                 mi.set_all_single_line_metrics()
+            if t.lower() == "grp":
+                mi.set_all_group_metrics()
             if t.lower() == "mean" or t.lower() == "mean-on":
                 mi.calc_mean = True
             if t.lower() == "mean-off":
