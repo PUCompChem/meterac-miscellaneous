@@ -3,30 +3,41 @@ import math
 import os.path
 from datetime import datetime, timezone
 
-metrics_info = ["mean",
-                "span"
+metrics_info = ["Single line metrics: ",
+                "  mean - the mean intensity for the frequency interval [dB].",
+                "  span - the dynamic span for the frequency interval, max - min [dB]"
                 ]
 
 class MetricsFlags:
     def __init__(self):
         self.calc_mean = False
+        self.calc_span = False
         self.errors =[]
     
-    def set_all_group_metrics(flag: bool):
+    def set_all_group_metrics(self, flag: bool):
+        self.calc_mean = flag
+        self.calc_span = flag
         pass
 
-    def set_all_single_line_metrics(flag: bool):
+    def set_all_single_line_metrics(self, flag: bool):
         pass    
 
 def extract_metrics_flags_from_string(s : str, splitter : str = "," ) -> MetricsFlags:
     mi = MetricsFlags()
-    tokens = s.split(splitter)
-    metrics_names = []
+    tokens = s.split(splitter)   
     for tok in tokens:
         t = tok.strip()
         if t != '':
-            if t.lower() == "mean":
+            if t.lower() == "sl":
+                mi.set_all_single_line_metrics()
+            if t.lower() == "mean" or t.lower() == "mean-on":
                 mi.calc_mean = True
+            if t.lower() == "mean-off":
+                mi.calc_mean = False
+            if t.lower() == "span" or t.lower() == "span-on":
+                mi.calc_span = True
+            if t.lower() == "span-off":
+                mi.calc_span = False       
             #TODO    
     return mi
 
