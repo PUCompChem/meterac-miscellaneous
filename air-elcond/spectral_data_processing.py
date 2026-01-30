@@ -152,36 +152,38 @@ class SpectralData:
     def get_even_frequency_intervals(self, numIntervals: int):
         self.frequency_intervals = get_even_slice_intervals(len(self.frequencies), numIntervals)
     
-    def calc_metrics_for_single_line(self, line_num: int) -> Metrics:
+    def calc_metrics_for_single_line(self, line_num: int, metr_flags: MetricsFlags) -> Metrics:
         #Get single line as a np array
         z1 = np.array(self.data_matrix[line_num], dtype='float32')
-        
+         
         metr = Metrics()
         metr.time_begin = self.utc_start[line_num]
         metr.time_end = self.utc_stop[line_num]
         n = len(self.frequency_intervals)
 
         # Interval mean
-        for i in range(n):
-            i_begin, i_end = self.frequency_intervals[i]
-            z1_i = z1[i_begin:i_end]
-            i_mean = np.mean(z1_i)
-            metr.values.append(i_mean)
-            metr.designations.append("mean_" + str(i+1))
+        if metr_flags.calc_mean:
+            for i in range(n):
+                i_begin, i_end = self.frequency_intervals[i]
+                z1_i = z1[i_begin:i_end]
+                i_mean = np.mean(z1_i)
+                metr.values.append(i_mean)
+                metr.designations.append("mean_" + str(i+1))
 
         # Interval span
-        for i in range(n):
-            i_begin, i_end = self.frequency_intervals[i]
-            z1_i = z1[i_begin:i_end]
-            i_min = np.min(z1_i)
-            i_max = np.max(z1_i)
-            i_span = i_max - i_min
-            metr.values.append(i_span)
-            metr.designations.append("span_" + str(i+1))
+        if metr_flags.calc_span:
+            for i in range(n):
+                i_begin, i_end = self.frequency_intervals[i]
+                z1_i = z1[i_begin:i_end]
+                i_min = np.min(z1_i)
+                i_max = np.max(z1_i)
+                i_span = i_max - i_min
+                metr.values.append(i_span)
+                metr.designations.append("span_" + str(i+1))
         
         return metr
 
-    def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int) -> Metrics:
+    def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int, metr_flags: MetricsFlags) -> Metrics:
         #Getting group lines in a np array
         z = np.array(self.data_matrix[start_line:end_line], dtype='float32')
         #z_mean = np.mean(z, axis=0)
@@ -199,21 +201,23 @@ class SpectralData:
         metr.time_end = self.utc_stop[end_line-1]
         
         # Interval delta max
-        for i in range(n):
-            i_begin, i_end = self.frequency_intervals[i]            
-            #print("interval indices: ", i_begin, i_end)
-            d = z_delta[i_begin:i_end]
-            max_d = np.max(d)
-            metr.values.append(max_d)
-            metr.designations.append("d_max_" + str(i+1))
+        if metr_flags.calc_d_max:
+            for i in range(n):
+                i_begin, i_end = self.frequency_intervals[i]            
+                #print("interval indices: ", i_begin, i_end)
+                d = z_delta[i_begin:i_end]
+                max_d = np.max(d)
+                metr.values.append(max_d)
+                metr.designations.append("d_max_" + str(i+1))
         
         # Interval delta RMS
-        for i in range(n):
-            i_begin, i_end = self.frequency_intervals[i]
-            d = z_delta[i_begin:i_end]
-            rms_d = np.sqrt(np.mean(d**2))
-            metr.values.append(rms_d)
-            metr.designations.append("d_rms_" + str(i+1))
+        if metr_flags.calc_d_rms:
+            for i in range(n):
+                i_begin, i_end = self.frequency_intervals[i]
+                d = z_delta[i_begin:i_end]
+                rms_d = np.sqrt(np.mean(d**2))
+                metr.values.append(rms_d)
+                metr.designations.append("d_rms_" + str(i+1))
         
         # RMS singanl statistics
         s_rms_min_values = []
@@ -240,16 +244,22 @@ class SpectralData:
             s_rms_max_designations.append("s_rms_max_" + str(i+1))
             s_rms_span_values.append(rms_span)
             s_rms_span_designations.append("s_rms_span_" + str(i+1))
-        metr.values.extend(s_rms_min_values)
-        metr.designations.extend(s_rms_min_designations)
-        metr.values.extend(s_rms_max_values)
-        metr.designations.extend(s_rms_max_designations)
-        metr.values.extend(s_rms_span_values)
-        metr.designations.extend(s_rms_span_designations)
+        
+        if metr_flags.calc_s_rms_min:
+            metr.values.extend(s_rms_min_values)
+            metr.designations.extend(s_rms_min_designations)
+        
+        if metr_flags.calc_s_rms_max:
+            metr.values.extend(s_rms_max_values)
+            metr.designations.extend(s_rms_max_designations)
+        
+        if metr_flags.calc_s_rms_span:
+            metr.values.extend(s_rms_span_values)
+            metr.designations.extend(s_rms_span_designations)
                 
         return metr
     
-    def calc_metrics_by_groups(self, group_size: int) -> list[Metrics]:
+    def calc_metrics_by_groups(self, group_size: int, metr_flags: MetricsFlags) -> list[Metrics]:
         num_lines = n = len(self.data_matrix)
         cur_line = 0
         metr_arr = []
@@ -259,13 +269,13 @@ class SpectralData:
                 end_line = num_lines
             if end_line - cur_line < group_size/2:
                 break #if the last group of lines is not "full enough" it is omitted
-            metr = self.calc_metrics_for_group_of_lines(cur_line, end_line)
+            metr = self.calc_metrics_for_group_of_lines(cur_line, end_line, metr_flags)
             metr_arr.append(metr)
             cur_line = cur_line + group_size
         return metr_arr    
 
-    def calc_metrics_for_entire_data_matrix(self) -> Metrics:
-        return self.calc_metrics_for_group_of_lines(0, len(self.data_matrix) -1)
+    def calc_metrics_for_entire_data_matrix(self, metr_flags: MetricsFlags) -> Metrics:
+        return self.calc_metrics_for_group_of_lines(0, len(self.data_matrix) -1, metr_flags)
 
 
 class SpectraProcessConfig:
