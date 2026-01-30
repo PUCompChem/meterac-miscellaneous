@@ -110,7 +110,7 @@ options = [CLIOption("i","input", True, "Input data file."),
            CLIOption("n","num-freq-intervals", True, "Number of frequency intervals."),
            CLIOption("g","group-size", True, "Group size - number of lines in a metrics aggregation group."),
            CLIOption("v","verbose", False, "More detailed info is output to the console."),
-           CLIOption("x","metrics-info", False, "Prints detailed metrics info."),           
+           CLIOption("x","print-metrics-info", False, "Prints detailed metrics info."),
            CLIOption("h","help", False, "Prints this help.")]
 
 
@@ -138,7 +138,7 @@ if "help" in arguments["boolean_options"]:
     print_help(options)
     exit()
 
-if "metrics-info" in arguments["boolean_options"]:
+if "print-metrics-info" in arguments["boolean_options"]:
     print("Full list of metrics:")
     for mi_item in metrics_info:
         print("  ", mi_item)
