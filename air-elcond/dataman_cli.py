@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.append("./")
 from spectral_data_processing import *
-from graphutils import *
+#from graphutils import *
 
 errors_out = []
 allowed_operation_list = ["wf-plot", "min-max-plot", "average-spectrum", "metrics"]
@@ -254,7 +254,7 @@ if num_freq_intervals == None:
 if line_group_size == None:
     line_group_size = cfg.group_num_of_lines    
 
-
+'''
 #print(out_file_prefix)
 if "wf-plot" in operations:
     if flag_verbose:
@@ -264,7 +264,7 @@ if "wf-plot" in operations:
         print("waterfall heatmap output:",figFileName)
     set_plot_config()
     get_heatmap_plot(adata, plotConfig = pconf, fileName = figFileName)
-
+'''
 
 if "metrics" in operations:
     sl_out_file = output_file + "-sl.csv"
