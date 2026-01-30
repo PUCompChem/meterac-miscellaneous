@@ -51,25 +51,26 @@ def get_all_metrics_flags() -> MetricsFlags:
     mi.set_all_flags(True)
     return mi
 
-def extract_metrics_flags_from_string(s : str, splitter : str = "," ) -> MetricsFlags:
+def extract_metrics_flags_from_string(s: str, splitter: str = "," ) -> MetricsFlags:
     mi = MetricsFlags()
     tokens = s.split(splitter)   
     for tok in tokens:
         t = tok.strip()
         if t != '':
             if t.lower() == "sl":
-                mi.set_all_single_line_metrics()
-            if t.lower() == "grp":
-                mi.set_all_group_metrics()
-            if t.lower() == "mean" or t.lower() == "mean-on":
+                mi.set_all_single_line_metrics(True)
+            elif t.lower() == "grp":
+                mi.set_all_group_metrics(True)
+            elif t.lower() == "mean" or t.lower() == "mean-on":
                 mi.calc_mean = True
-            if t.lower() == "mean-off":
+            elif t.lower() == "mean-off":
                 mi.calc_mean = False
-            if t.lower() == "span" or t.lower() == "span-on":
+            elif t.lower() == "span" or t.lower() == "span-on":
                 mi.calc_span = True
-            if t.lower() == "span-off":
+            elif t.lower() == "span-off":
                 mi.calc_span = False       
-            #TODO    
+            else:
+                mi.errors.append("Incorrect metrics: " + t)    
     return mi
 
 class Metrics:

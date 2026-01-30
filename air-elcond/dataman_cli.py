@@ -24,6 +24,7 @@ flag_default_operations = False
 
 num_freq_intervals = None
 line_group_size = None
+metrics_flags = None
 
 class CLIOption:
     def __init__(self, shortName: str, longName: str, requiresArgument : bool, info: str = ""):
@@ -203,11 +204,19 @@ if "num-freq-intervals" in arguments["standard_options"].keys():
 if "metrics-list" in arguments["standard_options"].keys():
     ml_str = arguments["standard_options"]["metrics-list"]
     if ml_str != None:
-        #TODO
-        pass
+        metrics_flags = extract_metrics_flags_from_string(ml_str)
+        n_mf_err = len(metrics_flags.errors)
+        if n_mf_err > 0:
+            for i in range(n_mf_err):
+                errors_out.append("Error in option -m (--metrics-list): " + metrics_flags.errors[i])
+                num_of_errors += 1
     else:
         errors_out.append("Option -m (--metrics-list) has no argument!")
         num_of_errors += 1
+else:
+    metrics_flags = get_all_metrics_flags()
+    if flag_verbose:
+        print("Calculating all possible metrics.")
 
 if "operations" in arguments["standard_options"].keys():
     operations_str = arguments["standard_options"]["operations"]
