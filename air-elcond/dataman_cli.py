@@ -109,6 +109,7 @@ options = [CLIOption("i","input", True, "Input data file."),
            CLIOption("c","config", True, "Specifies a config file."),
            CLIOption("n","num-freq-intervals", True, "Number of frequency intervals."),
            CLIOption("g","group-size", True, "Group size - number of lines in a metrics aggregation group."),
+           CLIOption("m","metrics-list", True, "Specifies the list of metrics to be calculated."),
            CLIOption("v","verbose", False, "More detailed info is output to the console."),
            CLIOption("x","print-metrics-info", False, "Prints detailed metrics info."),
            CLIOption("h","help", False, "Prints this help.")]
@@ -197,7 +198,16 @@ if "num-freq-intervals" in arguments["standard_options"].keys():
             num_of_errors += 1
     else:
         errors_out.append("Option -n (--num-freq-intervals) has no argument!")
-        num_of_errors += 1         
+        num_of_errors += 1
+
+if "metrics-list" in arguments["standard_options"].keys():
+    ml_str = arguments["standard_options"]["metrics-list"]
+    if ml_str != None:
+        #TODO
+        pass
+    else:
+        errors_out.append("Option -m (--metrics-list) has no argument!")
+        num_of_errors += 1
 
 if "operations" in arguments["standard_options"].keys():
     operations_str = arguments["standard_options"]["operations"]
