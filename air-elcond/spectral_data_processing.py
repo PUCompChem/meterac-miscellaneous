@@ -176,7 +176,7 @@ class SpectralData:
     def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int) -> Metrics:
         #Getting group lines in a np array
         z = np.array(self.data_matrix[start_line:end_line], dtype='float32')
-        z_mean = np.mean(z, axis=0)
+        #z_mean = np.mean(z, axis=0)
         z_min = np.min(z, axis=0)
         z_max = np.max(z, axis=0)
         z_delta = z_max - z_min        
@@ -190,30 +190,30 @@ class SpectralData:
         metr.time_begin = self.utc_start[start_line]
         metr.time_end = self.utc_stop[end_line-1]
         
-        # Interval max delta
+        # Interval delta max
         for i in range(n):
             i_begin, i_end = self.frequency_intervals[i]            
             #print("interval indices: ", i_begin, i_end)
             d = z_delta[i_begin:i_end]
             max_d = np.max(d)
             metr.values.append(max_d)
-            metr.designations.append("max_d_" + str(i+1))
+            metr.designations.append("d_max_" + str(i+1))
         
-        # Interval RMS delta
+        # Interval delta RMS
         for i in range(n):
             i_begin, i_end = self.frequency_intervals[i]
             d = z_delta[i_begin:i_end]
             rms_d = np.sqrt(np.mean(d**2))
             metr.values.append(rms_d)
-            metr.designations.append("rms_d_" + str(i+1))
+            metr.designations.append("d_rms_" + str(i+1))
         
-        # Intensity statistics
-        range_rms_min_values = []
-        range_rms_min_designations = []
-        range_rms_max_values = []
-        range_rms_max_designations = []
-        range_rms_span_values = []
-        range_rms_span_designations = []
+        # RMS singanl statistics
+        s_rms_min_values = []
+        s_rms_min_designations = []
+        s_rms_max_values = []
+        s_rms_max_designations = []
+        s_rms_span_values = []
+        s_rms_span_designations = []
         for i in range(n):
             i_begin, i_end = self.frequency_intervals[i]
             # Get interval columns
@@ -226,18 +226,18 @@ class SpectralData:
             rms_min = np.min(rms)
             rms_max = np.max(rms)
             rms_span = rms_max - rms_min
-            range_rms_min_values.append(rms_min)
-            range_rms_min_designations.append("range_rms_min_" + str(i+1))
-            range_rms_max_values.append(rms_max)
-            range_rms_max_designations.append("range_rms_max_" + str(i+1))
-            range_rms_span_values.append(rms_span)
-            range_rms_span_designations.append("range_rms_span_" + str(i+1))
-        metr.values.extend(range_rms_min_values)
-        metr.designations.extend(range_rms_min_designations)
-        metr.values.extend(range_rms_max_values)
-        metr.designations.extend(range_rms_max_designations)
-        metr.values.extend(range_rms_span_values)
-        metr.designations.extend(range_rms_span_designations)
+            s_rms_min_values.append(rms_min)
+            s_rms_min_designations.append("s_rms_min_" + str(i+1))
+            s_rms_max_values.append(rms_max)
+            s_rms_max_designations.append("s_rms_max_" + str(i+1))
+            s_rms_span_values.append(rms_span)
+            s_rms_span_designations.append("s_rms_span_" + str(i+1))
+        metr.values.extend(s_rms_min_values)
+        metr.designations.extend(s_rms_min_designations)
+        metr.values.extend(s_rms_max_values)
+        metr.designations.extend(s_rms_max_designations)
+        metr.values.extend(s_rms_span_values)
+        metr.designations.extend(s_rms_span_designations)
                 
         return metr
     
