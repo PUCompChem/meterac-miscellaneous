@@ -3,24 +3,48 @@ import math
 import os.path
 from datetime import datetime, timezone
 
-metrics_info = ["Single line metrics: ",
-                "  mean - the mean intensity for the frequency interval [dB].",
-                "  span - the dynamic span for the frequency interval, max - min [dB]"
+metrics_info = ["Single line metrics for a frequency interval {f1,f2,...,fk}",
+                "  with signal points/intensities {S(f1),S(f2),...,S(fk)}:",
+                "  -----------------------------------------------",
+                "  mean - the mean intensity for the frequency interval: mean{S(fi)|i=1,2,...,k}  [dB].",
+                "  span - the dynamic span for the frequency interval, max{S(fi)} - min{S(fi)}  [dB]",
+                "",
+                "Group metrics for a set of m lines {S(f1,j),S(f2,j),...,S(fk,j) | j = 1,2,...,m}:",
+                "  for each i: delta(fi) = max{S(fi,j) | j=1,...,m} - min{S(fi,j) | j=1,...,m}",
+                "  for each j: RMS(j) = sqrt(sum{S(fi,j)^2 | i=1,...,k}})",
+                "  -----------------------------------------------",
+                "  d_max - maximal delta = max{delta(fi)| i=1,...,k}}",
+                "  d_rms - RMS over all deltas = sqrt(sum{delta(fi)^2 | i=1,...,k}})",
+                "  s_rms_min - minimal RMS signal = min{RMS(j) | j = 1,...,m}",
+                "  s_rms_max - maximal RMS signal = max{RMS(j) | j = 1,...,m}",
+                "  s_rms_span - rms_max - rms_min}",
                 ]
 
 class MetricsFlags:
     def __init__(self):
         self.calc_mean = False
         self.calc_span = False
+        self.calc_d_max = False
+        self.calc_d_rms = False
+        self.calc_s_rms_min = False
+        self.calc_s_rms_max = False
+        self.calc_s_rms_span = False
         self.errors =[]
     
-    def set_all_group_metrics(self, flag: bool):
+    def set_all_single_line_metrics(self, flag: bool):
         self.calc_mean = flag
         self.calc_span = flag
-        pass
 
-    def set_all_single_line_metrics(self, flag: bool):
-        pass    
+    def set_all_group_metrics(self, flag: bool):
+        self.calc_d_max = flag
+        self.calc_d_rms = flag
+        self.calc_s_rms_min = flag
+        self.calc_s_rms_max = flag
+        self.calc_s_rms_span = flag
+  
+    def set_all_flags(self, flag: bool):
+        self.set_all_group_metrics(flag)
+        self.set_all_single_line_metrics(flag)
 
 def extract_metrics_flags_from_string(s : str, splitter : str = "," ) -> MetricsFlags:
     mi = MetricsFlags()
