@@ -331,10 +331,18 @@ def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     min = np.min(data)
     max = np.max(data)
     num_bins = math.ceil((max-min)/bin_delta)
+    if num_bins < 1:
+       num_bins = 1
     hist, bins = np.histogram(data, bins=num_bins)
-    print("bins: ", bins)
-    print("hist: ", hist)
-    #TODO calc entropy
+    p = hist/len(data)
+    entropy = 0.0
+    for x in p:
+        entropy = entropy - x*math.log(x,2)
+    #print("bins: ", bins)
+    #print("hist: ", hist)
+    #print("sum p:", np.sum(p))
+    #print("len(data):", len(data))
+    return entropy
 
 
 
