@@ -7,8 +7,8 @@ metrics_info = ["Single line metrics for a frequency interval {f1,f2,...,fk}",
                 "  with signal points/intensities {S(f1),S(f2),...,S(fk)}:",
                 "  -----------------------------------------------",
                 "  mean - the mean intensity for the frequency interval: mean{S(fi)|i=1,2,...,k}  [dB].",
-                "  span - the dynamic span for the frequency interval, max{S(fi)} - min{S(fi)}  [dB]",
-                "  entr - the entropy of the frequency interval based on bins of 1 dB",
+                "  span - the dynamic span for the frequency interval: max{S(fi)} - min{S(fi)}  [dB]",
+                "  entr - the entropy of the frequency interval, based on bins of 0.5 dB",
                 "",
                 "Group metrics for a set of m lines {S(f1,j),S(f2,j),...,S(fk,j) | j = 1,2,...,m}:",
                 "  for each i: delta(fi) = max{S(fi,j) | j=1,...,m} - min{S(fi,j) | j=1,...,m}",
@@ -19,6 +19,7 @@ metrics_info = ["Single line metrics for a frequency interval {f1,f2,...,fk}",
                 "  s_rms_min - minimal RMS signal = min{RMS(j) | j = 1,...,m}",
                 "  s_rms_max - maximal RMS signal = max{RMS(j) | j = 1,...,m}",
                 "  s_rms_span - rms_max - rms_min}",
+                "  s_rms_span - the entropy of the group of signal rms, based on bins of 0.1 dB"
                 ]
 
 class MetricsFlags:
@@ -31,6 +32,7 @@ class MetricsFlags:
         self.calc_s_rms_min = False
         self.calc_s_rms_max = False
         self.calc_s_rms_span = False
+        self.calc_s_rms_entr = False
         self.errors =[]
     
     def set_all_single_line_metrics(self, flag: bool):
@@ -44,19 +46,21 @@ class MetricsFlags:
         self.calc_s_rms_min = flag
         self.calc_s_rms_max = flag
         self.calc_s_rms_span = flag
+        self.calc_s_rms_entr = flag
   
     def set_all_flags(self, flag: bool):
         self.set_all_group_metrics(flag)
         self.set_all_single_line_metrics(flag)
 
     def has_single_line_metrics(self) -> bool:
-        if self.calc_mean or self.calc_span:
+        if self.calc_mean or self.calc_span or self.calc_entr:
             return True
         return False
 
     def has_group_metrics(self) -> bool:
         if self.calc_d_max or self.calc_d_rms or \
-           self.calc_s_rms_min or self.calc_s_rms_max or self.calc_s_rms_span:
+           self.calc_s_rms_min or self.calc_s_rms_max or \
+            self.calc_s_rms_span or self.calc_s_rms_entr:
                return True
         return False    
 
@@ -202,7 +206,7 @@ class SpectralData:
             for i in range(n):
                 i_begin, i_end = self.frequency_intervals[i]
                 z1_i = z1[i_begin:i_end]
-                i_entr = calc_entropy_based_on_even_bins(z1_i, 1.0) #bin_delta 1dB
+                i_entr = calc_entropy_based_on_even_bins(z1_i, 1.0) #bin_delta 0.5dB
                 metr.values.append(i_entr)
                 metr.designations.append("entr_" + str(i+1))
         return metr
@@ -250,6 +254,8 @@ class SpectralData:
         s_rms_max_designations = []
         s_rms_span_values = []
         s_rms_span_designations = []
+        s_rms_entr_values = []
+        s_rms_entr_designations = []
         for i in range(n):
             i_begin, i_end = self.frequency_intervals[i]
             # Get interval columns
@@ -262,12 +268,15 @@ class SpectralData:
             rms_min = np.min(rms)
             rms_max = np.max(rms)
             rms_span = rms_max - rms_min
+            rms_entr = calc_entropy_based_on_even_bins(rms, 0.1) #bin_delta 0.1dB
             s_rms_min_values.append(rms_min)
             s_rms_min_designations.append("s_rms_min_" + str(i+1))
             s_rms_max_values.append(rms_max)
             s_rms_max_designations.append("s_rms_max_" + str(i+1))
             s_rms_span_values.append(rms_span)
             s_rms_span_designations.append("s_rms_span_" + str(i+1))
+            s_rms_entr_values.append(rms_entr)
+            s_rms_entr_designations.append("s_rms_entr_" + str(i+1))
         
         if metr_flags.calc_s_rms_min:
             metr.values.extend(s_rms_min_values)
@@ -280,6 +289,10 @@ class SpectralData:
         if metr_flags.calc_s_rms_span:
             metr.values.extend(s_rms_span_values)
             metr.designations.extend(s_rms_span_designations)
+        
+        if metr_flags.calc_s_rms_entr:
+            metr.values.extend(s_rms_entr_values)
+            metr.designations.extend(s_rms_entr_designations)
                 
         return metr
     
