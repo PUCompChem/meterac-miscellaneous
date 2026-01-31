@@ -8,6 +8,7 @@ metrics_info = ["Single line metrics for a frequency interval {f1,f2,...,fk}",
                 "  -----------------------------------------------",
                 "  mean - the mean intensity for the frequency interval: mean{S(fi)|i=1,2,...,k}  [dB].",
                 "  span - the dynamic span for the frequency interval, max{S(fi)} - min{S(fi)}  [dB]",
+                "  entr - the entropy of the frequency interval based on bins of 1 dB",
                 "",
                 "Group metrics for a set of m lines {S(f1,j),S(f2,j),...,S(fk,j) | j = 1,2,...,m}:",
                 "  for each i: delta(fi) = max{S(fi,j) | j=1,...,m} - min{S(fi,j) | j=1,...,m}",
@@ -24,6 +25,7 @@ class MetricsFlags:
     def __init__(self):
         self.calc_mean = False
         self.calc_span = False
+        self.calc_entr = False
         self.calc_d_max = False
         self.calc_d_rms = False
         self.calc_s_rms_min = False
@@ -34,6 +36,7 @@ class MetricsFlags:
     def set_all_single_line_metrics(self, flag: bool):
         self.calc_mean = flag
         self.calc_span = flag
+        self.calc_entr = flag
 
     def set_all_group_metrics(self, flag: bool):
         self.calc_d_max = flag
@@ -194,6 +197,14 @@ class SpectralData:
                 metr.values.append(i_span)
                 metr.designations.append("span_" + str(i+1))
         
+        # Interval entropy
+        if metr_flags.calc_entr:
+            for i in range(n):
+                i_begin, i_end = self.frequency_intervals[i]
+                z1_i = z1[i_begin:i_end]
+                i_entr = calc_entropy_based_on_even_bins(z1_i, 1.0) #bin_delta 1dB
+                metr.values.append(i_entr)
+                metr.designations.append("entr_" + str(i+1))
         return metr
 
     def calc_metrics_for_group_of_lines(self, start_line: int, end_line: int, metr_flags: MetricsFlags) -> Metrics:
@@ -328,6 +339,7 @@ def get_even_slice_intervals(num_objects: int, num_intervals: int) -> list[objec
     return intervals
 
 def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
+    #print("### data =  ", data)
     min = np.min(data)
     max = np.max(data)
     num_bins = math.ceil((max-min)/bin_delta)
@@ -337,7 +349,8 @@ def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     p = hist/len(data)
     entropy = 0.0
     for x in p:
-        entropy = entropy - x*math.log(x,2)
+        if x > 0: # some bins might be 0
+            entropy = entropy - x*math.log(x,2)
     #print("bins: ", bins)
     #print("hist: ", hist)
     #print("sum p:", np.sum(p))
