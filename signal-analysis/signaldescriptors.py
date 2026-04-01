@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 
 allowed_descriptor_types = ["number", "list", "text"]
@@ -32,8 +33,13 @@ class DescriptorValue:
         self.info = info
 
 class CalcSignalDescriptors:
-    def __init__(self, signal: list[float], descriptors: list[str] = None): 
-        self.signal = signal  
+    def __init__(self, signal: list[float], 
+                 descriptors: list[str] = None, 
+                 sample_rate: float = 10,
+                 entropy_bin_delta: float = 1000): 
+        self.signal = signal
+        self.sample_rate =  sample_rate    #signal sample rate in  Hz (how many measurements per second)
+        self.entropy_bin_delta = entropy_bin_delta
         if descriptors != None:
             #TODO
             self.descriptors = None
@@ -66,8 +72,8 @@ class CalcSignalDescriptors:
             return self.calculateSpan()
         if name == "entropy":
             #assuming the signal is between -32000 and +32000,
-            # bin_delta ~1000 gives around 60 levels for entropy calculation
-            return self.calculateEntropy(1000)  
+            # bin_delta ~1000 (default value) gives around 60 levels for entropy calculation
+            return self.calculateEntropy(self.entropy_bin_delta)  
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
         
     def calculateNumOfPoints(self) -> DescriptorValue:
@@ -123,3 +129,57 @@ def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     #print("sum p:", np.sum(p))
     #print("len(data):", len(data))
     return entropy
+
+
+def calculate_rfft(signal: list[float], sample_rate: float = 1.0) -> dict:
+    """
+    Calculate the real FFT (optimized for real-valued signals, returns only positive frequencies).
+
+    Args:
+        signal: List of float numbers representing the signal
+        sample_rate: Sampling rate in Hz (default: 1.0)
+
+    Returns:
+        Dictionary containing:
+            - 'frequencies': Array of positive frequency values (Hz)
+            - 'amplitudes': Array of amplitude values
+            - 'phases': Array of phase values (radians)
+            - 'fft_complex': Raw complex FFT output (positive frequencies only)
+    """
+    signal_array = np.array(signal)
+    n = len(signal_array)
+
+    fft_complex = np.fft.rfft(signal_array)
+    frequencies = np.fft.rfftfreq(n, d=1.0 / sample_rate)
+    amplitudes = np.abs(fft_complex) / n
+    amplitudes[1:-1] *= 2  # Double non-DC, non-Nyquist components
+    phases = np.angle(fft_complex)
+
+    
+    return {
+        "frequencies": frequencies,
+        "amplitudes": amplitudes,
+        "phases": phases,
+        "fft_complex": fft_complex,
+    }
+
+
+def plot_amplitudes(fft_result: dict) -> None:
+    """
+    Plot the amplitude spectrum from an RFFT result.
+
+    Args:
+        fft_result: Dictionary returned by calculate_rfft(), containing
+                    'frequencies' and 'amplitudes' arrays
+    """
+    frequencies = fft_result["frequencies"]
+    amplitudes = fft_result["amplitudes"]
+
+    plt.figure(figsize=(10, 5))
+    plt.stem(frequencies, amplitudes, basefmt=" ")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Amplitude")
+    plt.title("Amplitude Spectrum")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()

@@ -17,6 +17,12 @@ for dname in dvalues.keys():
     dv = dvalues[dname]
     print (dname, dv.floatValue)
 
+fft_result= calculate_rfft(signal, 10)
+print ("number of frequencies", len(fft_result["frequencies"]))
+#print (fft_result["frequencies"])
+#print (fft_result["amplitudes"])
+
+plot_amplitudes (fft_result)
 
 '''
 print("numpoints: ", csd.calculateDescriptor("numpoints").floatValue)
