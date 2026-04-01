@@ -7,13 +7,20 @@ if len(sys.argv) < 2:
     print("Requires a file name")
     sys.exit()
 
-values = readFloatValuesFromSingleLineTextFile(sys.argv[1])
-#print(values)
+signal = readFloatValuesFromSingleLineTextFile(sys.argv[1])
+#print(signal)
+
+csd = CalcSignalDescriptors(signal)
+dvalues = csd.calculate()
+
+for dname in dvalues.keys():
+    dv = dvalues[dname]
+    print (dname, dv.floatValue)
 
 
-csd = CalcSignalDescriptors(values)
-#csd.calculate()
+'''
 print("numpoints: ", csd.calculateDescriptor("numpoints").floatValue)
 print("mean: ", csd.calculateDescriptor("mean").floatValue)
 print("rms: ", csd.calculateDescriptor("rms").floatValue)
 print("stdev: ", csd.calculateDescriptor("stdev").floatValue)
+'''

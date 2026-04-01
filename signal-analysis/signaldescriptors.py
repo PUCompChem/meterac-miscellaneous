@@ -26,17 +26,23 @@ class DescriptorValue:
         self.errorMsg = errorMsg
         self.info = info
 
-
 class CalcSignalDescriptors:
     def __init__(self, signal: list[float], descriptors: list[str] = None): 
         self.signal = signal  
-        self.descriptors = descriptors
-        #TODO handle None descriptors
+        if descriptors != None:
+            #TODO
+            self.descriptors = None
+        else:                
+            self.descriptors = descriptor_list  #by default entire descriptor list is used
         
     def calculate(self) -> dict[str, DescriptorValue]:
-        #TODO
-        print("TBD")
-        return None
+        dvalues = {}
+        if self.descriptors == None:
+            return dvalues
+        for d in self.descriptors:
+            dv = self.calculateDescriptor(d.name)
+            dvalues[d.name] = dv
+        return dvalues
     
     def calculateDescriptor(self, name: str) -> DescriptorValue:       
         if name == "numpoints":
