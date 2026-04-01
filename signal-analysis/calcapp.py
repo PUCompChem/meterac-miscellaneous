@@ -13,6 +13,7 @@ values = readFloatValuesFromSingleLineTextFile(sys.argv[1])
 
 csd = CalcSignalDescriptors(values)
 #csd.calculate()
+print("numpoints: ", csd.calculateDescriptor("numpoints").floatValue)
 print("mean: ", csd.calculateDescriptor("mean").floatValue)
 print("rms: ", csd.calculateDescriptor("rms").floatValue)
 print("stdev: ", csd.calculateDescriptor("stdev").floatValue)

@@ -11,6 +11,7 @@ class Descriptor:
         self.info = info
 
 descriptor_list = [
+    Descriptor("numpoints"),
     Descriptor("mean"),
     Descriptor("rms"),
     Descriptor("stdev"),
@@ -38,6 +39,8 @@ class CalcSignalDescriptors:
         return None
     
     def calculateDescriptor(self, name: str) -> DescriptorValue:       
+        if name == "numpoints":
+            return self.calculateNumOfPoints()
         if name == "mean":
             return self.calculateMean()
         if name == "rms":
@@ -46,6 +49,10 @@ class CalcSignalDescriptors:
             return self.calculateStDev()       
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
         
+    def calculateNumOfPoints(self) -> DescriptorValue:
+        val = len (self.signal)
+        return DescriptorValue(floatValue = val)
+    
     def calculateMean(self) -> DescriptorValue:
         val = np.mean(self.signal)
         return DescriptorValue(floatValue = val)
