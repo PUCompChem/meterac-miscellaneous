@@ -15,6 +15,9 @@ descriptor_list = [
     Descriptor("mean"),
     Descriptor("rms"),
     Descriptor("stdev"),
+    Descriptor("min"),
+    Descriptor("max"),
+    Descriptor("span"),
     ]
 
 class DescriptorValue:
@@ -52,7 +55,13 @@ class CalcSignalDescriptors:
         if name == "rms":
             return self.calculateRMS()
         if name == "stdev":
-            return self.calculateStDev()       
+            return self.calculateStDev()
+        if name == "min":
+            return self.calculateMin()
+        if name == "max":
+            return self.calculateMax()
+        if name == "span":
+            return self.calculateSpan()   
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
         
     def calculateNumOfPoints(self) -> DescriptorValue:
@@ -71,4 +80,16 @@ class CalcSignalDescriptors:
     def calculateStDev(self) -> DescriptorValue:
         #arr = np.array(self.signal)
         val = np.std(self.signal)
+        return DescriptorValue(floatValue = val)
+    
+    def calculateMin(self) -> DescriptorValue:  
+        val = np.min(self.signal)
+        return DescriptorValue(floatValue = val)
+    
+    def calculateMax(self) -> DescriptorValue:
+        val = np.max(self.signal)
+        return DescriptorValue(floatValue = val)
+    
+    def calculateSpan(self) -> DescriptorValue:
+        val = np.max(self.signal) - np.min(self.signal)
         return DescriptorValue(floatValue = val)
