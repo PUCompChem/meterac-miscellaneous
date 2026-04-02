@@ -20,13 +20,17 @@ descriptor_list = [
     Descriptor("min"),
     Descriptor("max"),
     Descriptor("span"),
-    Descriptor("entropy"),
-    Descriptor("rms_en_0_1Hz"),
-    Descriptor("rms_en_1_2Hz"),
-    Descriptor("rms_en_2_3Hz"),
-    Descriptor("rms_en_3_4Hz"),
-    Descriptor("rms_en_4_5Hz"),
+    Descriptor("entropy"),   
+    Descriptor("band_rms_energy")    
     ]
+
+default_frequency_band_list = [
+    [0,1],
+    [1,2],
+    [2,3],
+    [3,4],
+    [4,5]
+]
 
 class DescriptorValue:
     def __init__(self, floatValue: float = None, listValue: list[float] = None, textValue: str = None,
@@ -41,7 +45,8 @@ class CalcSignalDescriptors:
     def __init__(self, signal: list[float], 
                  descriptors: list[str] = None, 
                  sample_rate: float = 10,
-                 entropy_bin_delta: float = 1000): 
+                 entropy_bin_delta: float = 1000,
+                 frequency_bands: list[list[float]] = None):        
         self.signal = signal
         self.sample_rate =  sample_rate    #signal sample rate in  Hz (how many measurements per second)
         self.entropy_bin_delta = entropy_bin_delta
@@ -51,17 +56,26 @@ class CalcSignalDescriptors:
         else:                
             self.descriptors = descriptor_list  #by default entire descriptor list is used
         self.fft_result = None
+        if frequency_bands == None:
+            self.frequency_bands = default_frequency_band_list
+        else:
+            self.frequency_bands = frequency_bands
 
     def calculate(self) -> dict[str, DescriptorValue]:
         dvalues = {}
         if self.descriptors == None:
             return dvalues
         for d in self.descriptors:
-            dv = self.calculateDescriptor(d.name)
-            dvalues[d.name] = dv
+            if d.name == "band_rms_energy":
+                for b in self.frequency_bands:                    
+                    dv = self.calculateBandRMSEnergy(b[0], b[1])
+                    dvalues[dv.info] = dv   #dv.info is used for descriptor name
+            else:
+                dv = self.calculateDescriptor(d.name)
+                dvalues[d.name] = dv
         return dvalues
     
-    def calculateDescriptor(self, name: str) -> DescriptorValue:       
+    def calculateDescriptor(self, name: str, params:list[float] = None) -> DescriptorValue:       
         if name == "numpoints":
             return self.calculateNumOfPoints()
         if name == "mean":
@@ -79,7 +93,8 @@ class CalcSignalDescriptors:
         if name == "entropy":
             #assuming the signal is between -32000 and +32000,
             # bin_delta ~1000 (default value) gives around 60 levels for entropy calculation
-            return self.calculateEntropy(self.entropy_bin_delta)  
+            return self.calculateEntropy(self.entropy_bin_delta)
+       
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
 
     def get_fft_result(self) -> dict:
@@ -121,6 +136,14 @@ class CalcSignalDescriptors:
         arr = np.array(self.signal)
         val = calc_entropy_based_on_even_bins(arr, bin_delta)
         return DescriptorValue(floatValue = val)
+    
+    def calculateBandRMSEnergy(self, f1:float, f2:float) -> DescriptorValue:        
+        fft_res = self.get_fft_result()
+        f1_ = f1 if f1 > 0 else 0.001  #correction for 0 Hz
+        f2_ = f2 if f2 < fft_res["frequencies"][-1] else (fft_res["frequencies"][-1]-0.001)  #correction for last frequency
+        val = rms_energy_in_band(fft_res, f1_, f2_)
+        dv_info = "rms_en_"+ str(f1) + "_" + str(f2) + "Hz"
+        return DescriptorValue(floatValue = val, info = dv_info)
 
 def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     #print("### data =  ", data)
