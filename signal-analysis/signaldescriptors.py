@@ -275,7 +275,7 @@ def rms_energy_in_band(fft_result: dict, f1: float, f2: float) -> float:
 
 
 
-def find_peaks(fft_result: dict, threshold: float = 0.1, min_distance: int = None) -> dict:
+def find_fft_peaks(fft_result: dict, threshold: float = 0.1, min_distance: int = None) -> dict:
     """
     Find peaks in the FFT amplitude spectrum using threshold and minimum distance logic.
 
