@@ -82,7 +82,7 @@ class CalcSignalDescriptors:
             return self.calculateEntropy(self.entropy_bin_delta)  
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
 
-    def get_fft_result(self) -> {}:
+    def get_fft_result(self) -> dict:
         if self.fft_result == None:
             self.fft_result = calculate_rfft(self.signal, 10)
         return self.fft_result
