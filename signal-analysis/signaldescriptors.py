@@ -183,3 +183,44 @@ def plot_amplitudes(fft_result: dict) -> None:
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.show()
+
+
+
+def rms_energy_in_band(fft_result: dict, f1: float, f2: float) -> float:
+    """
+    Calculate the RMS amplitude within a specified frequency band [f1, f2].
+    Args:
+        fft_result: Dictionary returned by calculate_rfft(), containing
+                    'frequencies' and 'amplitudes' arrays
+        f1: Lower bound of the frequency band (Hz)
+        f2: Upper bound of the frequency band (Hz)
+
+    Returns:
+        RMS amplitude within the specified frequency band
+        or None in case of incorrect frequency band
+    """
+    
+    if f1 < 0 or f2 < 0:
+        return None
+
+    frequencies = fft_result["frequencies"]
+    amplitudes = fft_result["amplitudes"]
+
+    max_frequency = frequencies[-1]  #last element
+    
+    if f1 > max_frequency or f2 > max_frequency:
+        return None
+
+    mask = (frequencies >= f1) & (frequencies <= f2)
+    band_amplitudes = amplitudes[mask]
+
+    # Loop version — works but slow
+    #band_amplitudes = []
+    #for i in range(len(frequencies)):
+    #    if f1 <= frequencies[i] <= f2:
+    #        band_amplitudes.append(amplitudes[i])
+
+    if len(band_amplitudes) == 0:
+        return None
+
+    return np.sqrt(np.mean(band_amplitudes ** 2))
