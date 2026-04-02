@@ -21,7 +21,8 @@ descriptor_list = [
     Descriptor("max"),
     Descriptor("span"),
     Descriptor("entropy"),   
-    Descriptor("band_rms_energy")    
+    Descriptor("band_rms_energy"),
+    Descriptor("top_ft_5_peaks_pos")    
     ]
 
 default_frequency_band_list = [
@@ -60,20 +61,27 @@ class CalcSignalDescriptors:
                  descriptors: list[str] = None, 
                  sample_rate: float = 10,
                  entropy_bin_delta: float = 1000,
-                 frequency_bands: list[list[float]] = None):        
+                 frequency_bands: list[list[float]] = None,
+                 peak_threshold: float = 0.1):        
         self.signal = signal
         self.sample_rate =  sample_rate    #signal sample rate in  Hz (how many measurements per second)
         self.entropy_bin_delta = entropy_bin_delta
+        self.peak_threshold = peak_threshold
+        self.fft_result = None
+        self.fft_peaks = None
+
         if descriptors != None:
             #TODO
             self.descriptors = None
         else:                
             self.descriptors = descriptor_list  #by default entire descriptor list is used
         self.fft_result = None
+        
         if frequency_bands == None:
             self.frequency_bands = default_frequency_band_list
         else:
             self.frequency_bands = frequency_bands
+
 
     def calculate(self) -> dict[str, DescriptorValue]:
         dvalues = {}
@@ -115,6 +123,12 @@ class CalcSignalDescriptors:
         if self.fft_result == None:
             self.fft_result = calculate_rfft(self.signal, 10)
         return self.fft_result
+    
+    def get_fft_peaks(self) -> dict:
+       if self.fft_peaks == None:
+            fft_res = self.get_fft_result
+            self.fft_peaks = find_fft_peaks(fft_res, self.peak_threshold)
+       return self.fft_peaks
 
     def calculateNumOfPoints(self) -> DescriptorValue:
         val = len (self.signal)
