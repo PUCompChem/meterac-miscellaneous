@@ -224,3 +224,66 @@ def rms_energy_in_band(fft_result: dict, f1: float, f2: float) -> float:
         return None
 
     return np.sqrt(np.mean(band_amplitudes ** 2))
+
+
+
+def find_peaks(fft_result: dict, threshold: float = 0.1, min_distance: int = None) -> dict:
+    """
+    Find peaks in the FFT amplitude spectrum using threshold and minimum distance logic.
+
+    Args:
+        fft_result:     Dictionary returned by calculate_rfft()
+        threshold:      Minimum amplitude to consider as a peak, expressed as a
+                        fraction of the maximum amplitude (default: 0.1 = 10%)
+        min_distance:   Minimum number of bins between two peaks;
+                        if min_distance is not specified,  min_distance = 5% of length
+
+    Returns:
+        Dictionary containing:
+            - 'frequencies': Array of peak frequencies (Hz)
+            - 'amplitudes':  Array of peak amplitudes
+            - 'indices':     Array of peak indices in the original array
+    """
+    frequencies = fft_result["frequencies"]
+    amplitudes  = fft_result["amplitudes"]
+
+    if threshold < 0 or threshold > 1:
+        raise ValueError("Threshold must be between 0 and 1")
+        
+    # default min_distance: 5% of spectrum length
+    if min_distance is None:
+        min_distance = max(1, len(amplitudes) // 20)
+
+    if min_distance < 1:
+        min_distance = 1
+
+    # Step 1: apply threshold — ignore bins below threshold * max amplitude
+    abs_threshold = threshold * np.max(amplitudes)
+    above_threshold = amplitudes >= abs_threshold  #numpy masking
+
+    # Step 2: find local maxima — a bin is a peak if it is greater than its neighbors
+    is_local_max = np.zeros(len(amplitudes), dtype=bool)
+    for i in range(1, len(amplitudes) - 1):
+        if amplitudes[i] > amplitudes[i - 1] and amplitudes[i] > amplitudes[i + 1]:
+            is_local_max[i] = True
+
+    # Step 3: combine both conditions
+    peak_mask = above_threshold & is_local_max
+    peak_indices = np.where(peak_mask)[0]   #taking element 0 since np.where return tuple
+
+    # Step 4: enforce minimum distance between peaks — if two peaks are too
+    # close, keep only the stronger one
+    if min_distance > 1 and len(peak_indices) > 1:
+        filtered_indices = [peak_indices[0]]     # add first peak
+        for idx in peak_indices[1:]:  # iterate remaining peaks
+            if idx - filtered_indices[-1] >= min_distance:    # check whether peack is far enough?
+                filtered_indices.append(idx)  # add new peak 
+            elif amplitudes[idx] > amplitudes[filtered_indices[-1]]:  # peak is closer, but is it stronger?
+                filtered_indices[-1] = idx   # replace previous peak with the new one
+        peak_indices = np.array(filtered_indices)
+
+    return {
+        "frequencies": frequencies[peak_indices],
+        "amplitudes":  amplitudes[peak_indices],
+        "indices":     peak_indices
+    }
