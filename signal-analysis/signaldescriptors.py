@@ -22,7 +22,8 @@ descriptor_list = [
     Descriptor("span"),
     Descriptor("entropy"),   
     Descriptor("band_rms_energy"),
-    Descriptor("top_ft_5_peaks_pos")    
+    Descriptor("total_fft_peaks")
+    #Descriptor("top_ft_5_peaks_pos")    
     ]
 
 default_frequency_band_list = [
@@ -116,7 +117,9 @@ class CalcSignalDescriptors:
             #assuming the signal is between -32000 and +32000,
             # bin_delta ~1000 (default value) gives around 60 levels for entropy calculation
             return self.calculateEntropy(self.entropy_bin_delta) 
-               
+        if name == "total_fft_peaks":
+            return self.calculateTotalNumFFTPeaks()
+
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
 
     def get_fft_result(self) -> dict:
@@ -126,7 +129,7 @@ class CalcSignalDescriptors:
     
     def get_fft_peaks(self) -> dict:
        if self.fft_peaks == None:
-            fft_res = self.get_fft_result
+            fft_res = self.get_fft_result()
             self.fft_peaks = find_fft_peaks(fft_res, self.peak_threshold)
        return self.fft_peaks
 
@@ -172,6 +175,12 @@ class CalcSignalDescriptors:
         val = rms_energy_in_band(fft_res, f1_, f2_)
         dv_info = "rms_en_"+ str(f1) + "_" + str(f2) + "Hz"
         return DescriptorValue(floatValue = val, info = dv_info)
+    
+    def calculateTotalNumFFTPeaks(self) -> DescriptorValue:
+        fft_p = self.get_fft_peaks()
+        print(fft_p)    
+        return DescriptorValue(floatValue = np.size(fft_p["frequencies"]))
+
 
 def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     #print("### data =  ", data)
@@ -298,7 +307,7 @@ def find_fft_peaks(fft_result: dict, threshold: float = 0.1, min_distance: int =
         threshold:      Minimum amplitude to consider as a peak, expressed as a
                         fraction of the maximum amplitude (default: 0.1 = 10%)
         min_distance:   Minimum number of bins between two peaks;
-                        if min_distance is not specified,  min_distance = 5% of length
+                        if min_distance is not specified,  min_distance = 1% of length
 
     Returns:
         Dictionary containing:
@@ -312,9 +321,9 @@ def find_fft_peaks(fft_result: dict, threshold: float = 0.1, min_distance: int =
     if threshold < 0 or threshold > 1:
         raise ValueError("Threshold must be between 0 and 1")
         
-    # default min_distance: 5% of spectrum length
+    # default min_distance: 1% of spectrum length
     if min_distance is None:
-        min_distance = max(1, len(amplitudes) // 20)
+        min_distance = max(1, len(amplitudes) // 100)
 
     if min_distance < 1:
         min_distance = 1
@@ -324,6 +333,7 @@ def find_fft_peaks(fft_result: dict, threshold: float = 0.1, min_distance: int =
     above_threshold = amplitudes >= abs_threshold  #numpy masking
 
     # Step 2: find local maxima — a bin is a peak if it is greater than its neighbors
+    #position 0 (DC component, 0 Hz) is never detected as a peak
     is_local_max = np.zeros(len(amplitudes), dtype=bool)
     for i in range(1, len(amplitudes) - 1):
         if amplitudes[i] > amplitudes[i - 1] and amplitudes[i] > amplitudes[i + 1]:
@@ -345,7 +355,7 @@ def find_fft_peaks(fft_result: dict, threshold: float = 0.1, min_distance: int =
         peak_indices = np.array(filtered_indices)
 
     return {
-        "frequencies": frequencies[peak_indices],
+        "frequencies": frequencies[peak_indices],   #numpy fancy indexing is used
         "amplitudes":  amplitudes[peak_indices],
         "indices":     peak_indices
     }
