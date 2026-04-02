@@ -3,9 +3,14 @@ sys.path.append("./")
 from ioutils import *
 from signaldescriptors import *
 
+def is_in_args(value: str) -> bool:
+    return value in sys.argv
+
 if len(sys.argv) < 2:
     print("Requires a file name")
     sys.exit()
+
+flag_graphics = is_in_args("-g")
 
 signal = readFloatValuesFromSingleLineTextFile(sys.argv[1])
 #print(signal)
@@ -15,14 +20,15 @@ dvalues = csd.calculate()
 
 for dname in dvalues.keys():
     dv = dvalues[dname]
-    print (dname, dv.floatValue)
+    print (dname, dv.value_to_string())
 
 fft_result= calculate_rfft(signal, 10)
 print ("number of frequencies", len(fft_result["frequencies"]))
 #print (fft_result["frequencies"])
 #print (fft_result["amplitudes"])
 
-plot_amplitudes (fft_result)
+if flag_graphics:
+    plot_amplitudes (fft_result)
 
 '''
 print("numpoints: ", csd.calculateDescriptor("numpoints").floatValue)

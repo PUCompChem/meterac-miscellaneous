@@ -40,6 +40,20 @@ class DescriptorValue:
         self.textValue = textValue
         self.errorMsg = errorMsg
         self.info = info
+    
+    def value_to_string(self) -> str:
+        val = ""
+        if self.floatValue != None:
+            val = f"{self.floatValue:.2f}"
+        if self.textValue != None:
+            val = self.textValue
+        if self.listValue != None:
+            n = len(self.listValue)
+            for i in range(n):
+                val += f"{self.listValue[i]:.2f}"
+                if i < n-1:
+                    val +=" "
+        return val
 
 class CalcSignalDescriptors:
     def __init__(self, signal: list[float], 
@@ -93,8 +107,8 @@ class CalcSignalDescriptors:
         if name == "entropy":
             #assuming the signal is between -32000 and +32000,
             # bin_delta ~1000 (default value) gives around 60 levels for entropy calculation
-            return self.calculateEntropy(self.entropy_bin_delta)
-       
+            return self.calculateEntropy(self.entropy_bin_delta) 
+               
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
 
     def get_fft_result(self) -> dict:
