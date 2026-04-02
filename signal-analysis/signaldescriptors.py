@@ -21,6 +21,11 @@ descriptor_list = [
     Descriptor("max"),
     Descriptor("span"),
     Descriptor("entropy"),
+    Descriptor("rms_en_0_1Hz"),
+    Descriptor("rms_en_1_2Hz"),
+    Descriptor("rms_en_2_3Hz"),
+    Descriptor("rms_en_3_4Hz"),
+    Descriptor("rms_en_4_5Hz"),
     ]
 
 class DescriptorValue:
@@ -45,7 +50,8 @@ class CalcSignalDescriptors:
             self.descriptors = None
         else:                
             self.descriptors = descriptor_list  #by default entire descriptor list is used
-        
+        self.fft_result = None
+
     def calculate(self) -> dict[str, DescriptorValue]:
         dvalues = {}
         if self.descriptors == None:
@@ -75,7 +81,12 @@ class CalcSignalDescriptors:
             # bin_delta ~1000 (default value) gives around 60 levels for entropy calculation
             return self.calculateEntropy(self.entropy_bin_delta)  
         return DescriptorValue(errorMsg = "Descriptor '" + name + "' is not supported")
-        
+
+    def get_fft_result(self) -> {}:
+        if self.fft_result == None:
+            self.fft_result = calculate_rfft(self.signal, 10)
+        return self.fft_result
+
     def calculateNumOfPoints(self) -> DescriptorValue:
         val = len (self.signal)
         return DescriptorValue(floatValue = val)
