@@ -22,7 +22,7 @@ for dname in dvalues.keys():
     dv = dvalues[dname]
     print (dname, dv.value_to_string())
 
-fft_result= calculate_rfft(signal, 10)
+fft_result= calculate_real_fft(signal, 10)
 print ("number of frequencies", len(fft_result["frequencies"]))
 #print (fft_result["frequencies"])
 #print (fft_result["amplitudes"])

@@ -124,7 +124,7 @@ class CalcSignalDescriptors:
 
     def get_fft_result(self) -> dict:
         if self.fft_result == None:
-            self.fft_result = calculate_rfft(self.signal, 10)
+            self.fft_result = calculate_real_fft(self.signal, 10)
         return self.fft_result
     
     def get_fft_peaks(self) -> dict:
@@ -202,7 +202,7 @@ def calc_entropy_based_on_even_bins(data: np.ndarray, bin_delta:float) -> float:
     return entropy
 
 
-def calculate_rfft(signal: list[float], sample_rate: float = 1.0) -> dict:
+def calculate_real_fft(signal: list[float], sample_rate: float = 1.0) -> dict:
     """
     Calculate the real FFT (optimized for real-valued signals, returns only positive frequencies).
 
