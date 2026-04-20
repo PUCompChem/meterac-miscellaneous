@@ -24,10 +24,15 @@ if has_cli_option("-h", "--help"):
     print("Description:")
     print("   A program for calculation of basic signal descriptors.")
     print("Options:")
-    print("  -h, --help          Show this help message and exit")
-    print("  -f, --file <file>   Input file to process")
-    print("  -g, --graphics      Visualizes FFT graphics (for test purposes only)")
-    print("  -V, --verbose         Enable verbose/debug output")
+    print("  -h, --help             Show this help message and exit")
+    print("  -f, --file <file>      Input file to process")
+    print("  -g, --graphics         Visualizes FFT graphics (for test purposes only)")
+    print("  -d, --descriptor-list  Print the descriptor list")
+    print("  -V, --verbose          Enable verbose/debug output")
+    exit()
+
+if has_cli_option("-d", "--descriptor-list"):
+    print("numpoints, mean")
     exit()
 
 flag_graphics = has_cli_option("-g", "-graphics")
