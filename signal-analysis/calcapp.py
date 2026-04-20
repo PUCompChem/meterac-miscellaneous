@@ -3,16 +3,31 @@ sys.path.append("./")
 from ioutils import *
 from signaldescriptors import *
 
-def is_in_args(value: str) -> bool:
-    return value in sys.argv
+CLI_OPTIONS = {'-h', '--help', '-i', '--input', '-g', '--graphics'}
 
-if len(sys.argv) < 2:
-    print("Requires a file name")
-    sys.exit()
+def has_cli_option(short: str, long: str) -> bool:
+    return short in sys.argv or long in sys.argv
 
-flag_graphics = is_in_args("-g")
+def get_cli_option(short: str, long: str, reserved: set = CLI_OPTIONS) -> str:   
+    args = sys.argv[1:]
+    for i, arg in enumerate(args):
+        if arg in (short, long) and i + 1 < len(args):
+            value = args[i + 1]
+            if value in reserved:
+                raise ValueError(f"Value '{value}' is a reserved option flag, not a valid value for '{arg}'.")
+                return None
+            return value
+    return None
 
-signal = readFloatValuesFromSingleLineTextFile(sys.argv[1])
+
+flag_graphics = has_cli_option("-g", "-graphics")
+input_file_name = get_cli_option("-i", "--input")
+
+if input_file_name == None:
+    print ("Requires option -i with input file!")
+    exit()
+
+signal = readFloatValuesFromSingleLineTextFile(input_file_name)
 #print(signal)
 
 csd = CalcSignalDescriptors(signal)
