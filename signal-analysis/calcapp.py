@@ -20,6 +20,14 @@ def get_cli_option(short: str, long: str, reserved: set = CLI_OPTIONS) -> str:
     return None
 
 
+if has_cli_option("-h", "--help"):
+    print("Description:")
+    print("   A program for calculation of basic signal descriptors.")
+    print("Options:")
+    print("  -h, --help          Show this help message and exit")
+    print("  -f, --file <file>   Input file to process")
+    exit()
+
 flag_graphics = has_cli_option("-g", "-graphics")
 input_file_name = get_cli_option("-i", "--input")
 
