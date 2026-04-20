@@ -178,7 +178,7 @@ class CalcSignalDescriptors:
     
     def calculateTotalNumFFTPeaks(self) -> DescriptorValue:
         fft_p = self.get_fft_peaks()
-        print(fft_p)    
+        #print(fft_p)
         return DescriptorValue(floatValue = np.size(fft_p["frequencies"]))
 
 
