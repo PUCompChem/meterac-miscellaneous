@@ -26,9 +26,12 @@ if has_cli_option("-h", "--help"):
     print("Options:")
     print("  -h, --help          Show this help message and exit")
     print("  -f, --file <file>   Input file to process")
+    print("  -g, --graphics      Visualizes FFT graphics (for test purposes only)")
+    print("  -V, --verbose         Enable verbose/debug output")
     exit()
 
 flag_graphics = has_cli_option("-g", "-graphics")
+flag_verbose = has_cli_option("-V", "-verbose")
 input_file_name = get_cli_option("-i", "--input")
 
 if input_file_name == None:
@@ -41,18 +44,20 @@ signal = readFloatValuesFromSingleLineTextFile(input_file_name)
 csd = CalcSignalDescriptors(signal)
 dvalues = csd.calculate()
 
-for dname in dvalues.keys():
-    dv = dvalues[dname]
-    print (dname, dv.value_to_string())
-
-fft_result= calculate_real_fft(signal, 10)
-print ("number of frequencies", len(fft_result["frequencies"]))
-#print (fft_result["frequencies"])
-#print (fft_result["amplitudes"])
+if flag_verbose:
+    for dname in dvalues.keys():
+        dv = dvalues[dname]
+        print (dname, dv.value_to_string())
 
 if flag_graphics:
+    fft_result = csd.get_fft_result()    
+    #print ("number of frequencies", len(fft_result["frequencies"]))
+    #print (fft_result["frequencies"])
+    #print (fft_result["amplitudes"])
     plot_amplitudes (fft_result)
 
+
+    
 '''
 print("numpoints: ", csd.calculateDescriptor("numpoints").floatValue)
 print("mean: ", csd.calculateDescriptor("mean").floatValue)
