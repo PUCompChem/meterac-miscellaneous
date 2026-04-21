@@ -34,6 +34,24 @@ default_frequency_band_list = [
     [4,5]
 ]
 
+def get_descriptor_list_as_string(sep: str = " ") -> str:
+    dl_str = ""
+    n = len(descriptor_list)
+    n_bands = len(default_frequency_band_list)
+    for i, d in enumerate(descriptor_list):
+        if d.name == "band_rms_energy":
+            for k, b in enumerate(default_frequency_band_list):
+                name = "rms_en_"+ str(b[0]) + "_" + str(b[1]) + "Hz"
+                dl_str += name
+                if k < n_bands-1:
+                    dl_str += sep
+        else:
+            dl_str += d.name
+        
+        if i < n-1:
+            dl_str += sep        
+    return dl_str
+
 class DescriptorValue:
     def __init__(self, floatValue: float = None, listValue: list[float] = None, textValue: str = None,
                   errorMsg: str = None, info: str = None):

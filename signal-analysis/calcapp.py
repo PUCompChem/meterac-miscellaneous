@@ -32,7 +32,7 @@ if has_cli_option("-h", "--help"):
     exit()
 
 if has_cli_option("-d", "--descriptor-list"):
-    print("numpoints, mean")
+    print(get_descriptor_list_as_string())
     exit()
 
 flag_graphics = has_cli_option("-g", "-graphics")
