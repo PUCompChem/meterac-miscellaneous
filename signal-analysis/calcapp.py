@@ -49,10 +49,23 @@ signal = readFloatValuesFromSingleLineTextFile(input_file_name)
 csd = CalcSignalDescriptors(signal)
 dvalues = csd.calculate()
 
+n_extra_zerors = 10
+
 if flag_verbose:
     for dname in dvalues.keys():
         dv = dvalues[dname]
         print (dname, dv.value_to_string())
+else:
+    #Non verbose output in a single line
+    out_str = ""
+    for dname in dvalues.keys():
+        dv = dvalues[dname]
+        out_str += dv.value_to_string()
+        out_str += " "
+    #Extra zeros for future descriptors
+    for i in range(n_extra_zerors):
+        out_str += "0 "
+    print(out_str)
 
 if flag_graphics:
     fft_result = csd.get_fft_result()    
