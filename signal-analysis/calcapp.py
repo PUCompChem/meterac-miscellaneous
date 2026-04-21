@@ -25,7 +25,7 @@ if has_cli_option("-h", "--help"):
     print("   A program for calculation of basic signal descriptors.")
     print("Options:")
     print("  -h, --help             Show this help message and exit")
-    print("  -f, --file <file>      Input file to process")
+    print("  -i, --input <file>     Input file to process")
     print("  -g, --graphics         Visualizes FFT graphics (for test purposes only)")
     print("  -d, --descriptor-list  Print the descriptor list")
     print("  -V, --verbose          Enable verbose/debug output")
