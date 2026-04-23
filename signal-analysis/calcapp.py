@@ -3,7 +3,8 @@ sys.path.append("./")
 from ioutils import *
 from signaldescriptors import *
 
-CLI_OPTIONS = {'-h', '--help', '-i', '--input', '-g', '--graphics'}
+CLI_OPTIONS = {"-h", "--help", "-i", "-input", "-g", "--graphics", "-e", "--no-endline",
+                "V", "-verbose"}
 
 def has_cli_option(short: str, long: str) -> bool:
     return short in sys.argv or long in sys.argv
@@ -29,12 +30,14 @@ if has_cli_option("-h", "--help"):
     print("  -g, --graphics         Visualizes FFT graphics (for test purposes only)")
     print("  -d, --descriptor-list  Print the descriptor list")
     print("  -V, --verbose          Enable verbose/debug output")
+    print("  -e, --no-endline       Output without endline symbol")
     exit()
 
 if has_cli_option("-d", "--descriptor-list"):
     print(get_descriptor_list_as_string())
     exit()
 
+flag_no_endline = has_cli_option("-e", "--no-endline")
 flag_graphics = has_cli_option("-g", "-graphics")
 flag_verbose = has_cli_option("-V", "-verbose")
 input_file_name = get_cli_option("-i", "--input")
@@ -65,7 +68,10 @@ else:
     #Extra zeros for future descriptors
     for i in range(n_extra_zerors):
         out_str += "0 "
-    print(out_str)
+    if flag_no_endline:
+        print(out_str, end = "")
+    else:    
+        print(out_str)
 
 if flag_graphics:
     fft_result = csd.get_fft_result()    
