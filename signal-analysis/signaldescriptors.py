@@ -1,6 +1,5 @@
 import numpy as np
 import math
-import matplotlib.pyplot as plt
 
 
 allowed_descriptor_types = ["number", "list", "text"]
