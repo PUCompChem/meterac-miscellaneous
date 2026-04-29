@@ -3,7 +3,7 @@ sys.path.append("./")
 from ioutils import *
 from signaldescriptors import *
 
-CLI_OPTIONS = {"-h", "--help", "-i", "-input", "-g", "--graphics", "-e", "--no-endline",
+CLI_OPTIONS = {"-h", "--help", "-i", "-input", "-e", "--no-endline",
                 "V", "-verbose"}
 
 def has_cli_option(short: str, long: str) -> bool:
@@ -27,7 +27,7 @@ if has_cli_option("-h", "--help"):
     print("Options:")
     print("  -h, --help             Show this help message and exit")
     print("  -i, --input <file>     Input file to process")
-    print("  -g, --graphics         Visualizes FFT graphics (for test purposes only)")
+    #print("  -g, --graphics         Visualizes FFT graphics (for test purposes only)")
     print("  -d, --descriptor-list  Print the descriptor list")
     print("  -V, --verbose          Enable verbose/debug output")
     print("  -e, --no-endline       Output without endline symbol")
@@ -38,7 +38,7 @@ if has_cli_option("-d", "--descriptor-list"):
     exit()
 
 flag_no_endline = has_cli_option("-e", "--no-endline")
-flag_graphics = has_cli_option("-g", "-graphics")
+#flag_graphics = has_cli_option("-g", "-graphics")
 flag_verbose = has_cli_option("-V", "-verbose")
 input_file_name = get_cli_option("-i", "--input")
 
@@ -66,20 +66,22 @@ else:
         out_str += dv.value_to_string()
         out_str += " "
     #Extra zeros for future descriptors
-    for i in range(n_extra_zerors):
+    for i in range(n_extra_zerors-1):
         out_str += "0 "
+    out_str += "0"
+
     if flag_no_endline:
         print(out_str, end = "")
     else:    
         print(out_str)
-
+'''
 if flag_graphics:
     fft_result = csd.get_fft_result()    
     #print ("number of frequencies", len(fft_result["frequencies"]))
     #print (fft_result["frequencies"])
     #print (fft_result["amplitudes"])
     plot_amplitudes (fft_result)
-
+'''
 
     
 '''
