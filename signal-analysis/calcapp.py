@@ -4,7 +4,7 @@ from ioutils import *
 from signaldescriptors import *
 
 CLI_OPTIONS = {"-h", "--help", "-i", "-input", "-e", "--no-endline",
-                "V", "-verbose"}
+                "-V", "--verbose"}
 
 def has_cli_option(short: str, long: str) -> bool:
     return short in sys.argv or long in sys.argv
@@ -26,8 +26,7 @@ if has_cli_option("-h", "--help"):
     print("   A program for calculation of basic signal descriptors.")
     print("Options:")
     print("  -h, --help             Show this help message and exit")
-    print("  -i, --input <file>     Input file to process")
-    #print("  -g, --graphics         Visualizes FFT graphics (for test purposes only)")
+    print("  -i, --input <file>     Input file to process")   
     print("  -d, --descriptor-list  Print the descriptor list")
     print("  -V, --verbose          Enable verbose/debug output")
     print("  -e, --no-endline       Output without endline symbol")
@@ -74,14 +73,6 @@ else:
         print(out_str, end = "")
     else:    
         print(out_str)
-'''
-if flag_graphics:
-    fft_result = csd.get_fft_result()    
-    #print ("number of frequencies", len(fft_result["frequencies"]))
-    #print (fft_result["frequencies"])
-    #print (fft_result["amplitudes"])
-    plot_amplitudes (fft_result)
-'''
 
     
 '''
